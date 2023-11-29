@@ -23,17 +23,17 @@ public class UserController {
     }
 
     private UserDomain toDomain(UserInDto userInDto) {
-        UserDomain userDomain = new UserDomain();
-        userDomain.setUserName(userInDto.getUserName());
-        userDomain.setPassword(userInDto.getPassword());
-        userDomain.setUserId(UUID.randomUUID().toString());
-        return userDomain;
+        return UserDomain.builder()
+                .userId(UUID.randomUUID().toString())
+                .userName(userInDto.getUserName())
+                .password(userInDto.getPassword())
+                .build();
     }
 
     private UserOutDto toOutDto(UserDomain userDomain) {
-        UserOutDto userOutDto = new UserOutDto();
-        userOutDto.setUserId(userDomain.getUserId());
-        userOutDto.setUserName(userDomain.getUserName());
-        return userOutDto;
+        return UserOutDto.builder()
+                .userId(userDomain.getUserId())
+                .userName(userDomain.getUserName())
+                .build();
     }
 }
