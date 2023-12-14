@@ -4,7 +4,9 @@
 package com.skillup.infrastructure.jooq;
 
 
+import com.skillup.infrastructure.jooq.tables.Commodity;
 import com.skillup.infrastructure.jooq.tables.User;
+import com.skillup.infrastructure.jooq.tables.records.CommodityRecord;
 import com.skillup.infrastructure.jooq.tables.records.UserRecord;
 
 import org.jooq.TableField;
@@ -24,6 +26,7 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final UniqueKey<CommodityRecord> KEY_COMMODITY_PRIMARY = Internal.createUniqueKey(Commodity.COMMODITY, DSL.name("KEY_commodity_PRIMARY"), new TableField[] { Commodity.COMMODITY.COMMODITY_ID }, true);
     public static final UniqueKey<UserRecord> KEY_USER_PRIMARY = Internal.createUniqueKey(User.USER, DSL.name("KEY_user_PRIMARY"), new TableField[] { User.USER.USER_ID }, true);
     public static final UniqueKey<UserRecord> KEY_USER_USER_NAME = Internal.createUniqueKey(User.USER, DSL.name("KEY_user_user_name"), new TableField[] { User.USER.USER_NAME }, true);
 }
