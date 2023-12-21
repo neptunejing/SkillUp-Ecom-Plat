@@ -10,20 +10,17 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-import static org.jooq.impl.DSL.lag;
-import static org.jooq.impl.DSL.selectFrom;
-
 @Repository
 public class JooqUserRepo implements UserRepository {
     @Autowired
     DSLContext dslContext;
 
+    public static final User USER_T = new User();
+
     @Override
     public void createUser(UserDomain userDomain) {
         dslContext.executeInsert(toRecord(userDomain));
     }
-
-    public static final User USER_T = new User();
 
     @Override
     public UserDomain getUserById(String id) {
