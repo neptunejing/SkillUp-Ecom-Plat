@@ -24,4 +24,14 @@ public class OversellStrategy implements StockOperation {
         promotionRepository.updatePromotionStock(promotionDomain);
         return true;
     }
+
+    @Override
+    public boolean deductPromotionStock(String promotionId) {
+        return false;
+    }
+
+    @Override
+    public boolean revertPromotionStock(String promotionId) {
+        return false;
+    }
 }

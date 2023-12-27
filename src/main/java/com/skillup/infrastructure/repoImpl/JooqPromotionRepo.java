@@ -50,7 +50,7 @@ public class JooqPromotionRepo implements PromotionRepository, StockOperation {
          * set available_stock = available_stock - 1, lock_stock = lock_stock + 1
          * where id = promotion_id and available_stock > 0
         */
-        log.info("----- Optimistic Strategy -----");
+        log.info("----- Optimistic Strategy: Lock -----");
         int isLocked = dslContext.update(PROMOTION_T)
                 .set(PROMOTION_T.AVAILABLE_STOCK, PROMOTION_T.AVAILABLE_STOCK.subtract(1))
                 .set(PROMOTION_T.LOCK_STOCK, PROMOTION_T.LOCK_STOCK.add(1))
@@ -62,12 +62,33 @@ public class JooqPromotionRepo implements PromotionRepository, StockOperation {
 
     @Override
     public boolean deductPromotionStock(String promotionId) {
-        return false;
+        /**
+         * update promotion
+         * set lock_stock = lock_stock - 1
+         * where id = promotion_id and lock_stock > 0
+         */
+        log.info("----- Optimistic Strategy: Deduct -----");
+        int isDeducted = dslContext.update(PROMOTION_T)
+                .set(PROMOTION_T.LOCK_STOCK, PROMOTION_T.LOCK_STOCK.subtract(1))
+                .where(PROMOTION_T.PROMOTION_ID.eq(promotionId).and(PROMOTION_T.LOCK_STOCK.greaterThan(0L)))
+                .execute();
+        return isDeducted == 1;
     }
 
     @Override
     public boolean revertPromotionStock(String promotionId) {
-        return false;
+        /**
+         * update promotion
+         * set available_stock = available_stock + 1, lock_stock = lock_stock - 1
+         * where id = promotion_id and lock_stock > 0
+         */
+        log.info("----- Optimistic Strategy: Revert -----");
+        int isReverted = dslContext.update(PROMOTION_T)
+                .set(PROMOTION_T.AVAILABLE_STOCK, PROMOTION_T.AVAILABLE_STOCK.add(1))
+                .set(PROMOTION_T.LOCK_STOCK, PROMOTION_T.LOCK_STOCK.subtract(1))
+                .where(PROMOTION_T.PROMOTION_ID.eq(promotionId).and(PROMOTION_T.LOCK_STOCK.greaterThan(0L)))
+                .execute();
+        return isReverted == 1;
     }
 
     private PromotionRecord toRecord(PromotionDomain promotionDomain) {

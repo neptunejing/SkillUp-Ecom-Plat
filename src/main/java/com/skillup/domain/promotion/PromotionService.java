@@ -33,10 +33,10 @@ public class PromotionService {
     }
 
     public boolean deductPromotionStock(String promotionId) {
-        return true;
+        return stockOperation.deductPromotionStock(promotionId);
     }
 
     public boolean revertPromotionStock(String promotionId) {
-        return true;
+        return stockOperation.revertPromotionStock(promotionId);
     }
 }

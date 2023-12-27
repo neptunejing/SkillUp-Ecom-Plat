@@ -10,8 +10,4 @@ public interface PromotionRepository {
     List<PromotionDomain> getPromotionByStatus(int status);
 
     void updatePromotionStock(PromotionDomain promotionDomain);
-
-    boolean deductPromotionStock(String promotionId);
-
-    boolean revertPromotionStock(String promotionId);
 }

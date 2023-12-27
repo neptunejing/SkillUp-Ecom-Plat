@@ -62,12 +62,29 @@ public class PromotionController {
 
     @PostMapping("/deduct/id/{id}")
     public ResponseEntity<Boolean> deductPromotionStock(@PathVariable("id") String promotionId) {
-        return null;
+        PromotionDomain promotionDomain = promotionService.getPromotionById(promotionId);
+        if (Objects.isNull(promotionDomain)) {
+            return ResponseEntity.status(SkillUpCommon.BAD_REQUEST).body(false);
+        }
+        boolean isDeducted = promotionService.deductPromotionStock(promotionId);
+        if (isDeducted) {
+            return ResponseEntity.status(SkillUpCommon.SUCCESS).body(true);
+        }
+        return ResponseEntity.status(SkillUpCommon.SUCCESS).body(false);
+
     }
 
     @PostMapping("revert/id/{id}")
     public ResponseEntity<Boolean> revertPromotionStock(@PathVariable("id") String promotionId) {
-        return null;
+        PromotionDomain promotionDomain = promotionService.getPromotionById(promotionId);
+        if (Objects.isNull(promotionDomain)) {
+            return ResponseEntity.status(SkillUpCommon.BAD_REQUEST).body(false);
+        }
+        boolean isReverted = promotionService.revertPromotionStock(promotionId);
+        if (isReverted) {
+            return ResponseEntity.status(SkillUpCommon.SUCCESS).body(true);
+        }
+        return ResponseEntity.status(SkillUpCommon.SUCCESS).body(false);
     }
 
     private PromotionDomain toDomain(PromotionInDto promotionInDto) {
