@@ -11,8 +11,6 @@ public interface PromotionRepository {
 
     void updatePromotionStock(PromotionDomain promotionDomain);
 
-    boolean lockPromotionStock(String promotionId);
-
     boolean deductPromotionStock(String promotionId);
 
     boolean revertPromotionStock(String promotionId);
