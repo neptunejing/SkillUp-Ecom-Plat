@@ -30,7 +30,7 @@ window.onload = function() {
 		success: function (list) {
 			$.each(list, function(key, promotion) {
 				console.log(promotion);
-				cover = "img/items/"+ promotion.imageUrl + "/cover.jpg";
+				cover = "img/items/"+ promotion.imageURL + "/cover.jpg";
 				$('#promotion').append("<li class='skillup-item'>\
 											<div class='pic'>\
 												<img src='" + cover + "' alt=''>\
