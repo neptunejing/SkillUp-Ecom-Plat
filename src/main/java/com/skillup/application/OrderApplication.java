@@ -7,6 +7,7 @@ import com.skillup.domain.promotion.PromotionDomain;
 import com.skillup.domain.promotion.PromotionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -19,6 +20,7 @@ public class OrderApplication {
     @Autowired
     PromotionService promotionService;
 
+    @Transactional
     public OrderDomain createBuyNowOrder(OrderDomain orderDomain) {
         // 1. check if a promotion id exists
         PromotionDomain promotionDomain = promotionService.getPromotionById(orderDomain.getPromotionId());

@@ -8,6 +8,8 @@ import com.skillup.infrastructure.jooq.tables.records.OrderRecord;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class JooqOrderRepo implements OrderRepository {
@@ -18,6 +20,7 @@ public class JooqOrderRepo implements OrderRepository {
 
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public void createOrder(OrderDomain orderDomain) {
         dslContext.executeInsert(toRecord(orderDomain));
     }
