@@ -62,7 +62,7 @@ public class OrderController {
 
     private OrderOutDto toOutDto(OrderDomain orderDomain) {
         return OrderOutDto.builder()
-                .orderNumber(orderDomain.getOrderNumber())
+                .orderNumber(String.valueOf(orderDomain.getOrderNumber()))
                 .orderStatus(orderDomain.getOrderStatus().code)
                 .promotionId(orderDomain.getPromotionId())
                 .promotionName(orderDomain.getPromotionName())

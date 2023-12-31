@@ -10,13 +10,13 @@ public enum OrderStatus {
     PAYED(2), // paid
     OVERTIME(3); // invalid or expired order
 
-    public Integer code;
+    public final Integer code;
 
     OrderStatus(Integer code) {
         this.code = code;
     }
 
-    public static HashMap<Integer, OrderStatus> CACHE = new HashMap<Integer, OrderStatus>() {{
+    public static final HashMap<Integer, OrderStatus> CACHE = new HashMap<Integer, OrderStatus>() {{
         put(-2, ITEM_ERROR);
         put(-1, OUT_OF_STOCK);
         put(0, READY);

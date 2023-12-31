@@ -117,6 +117,8 @@ public class JooqPromotionRepo implements PromotionRepository, StockOperation {
                 .promotionId(promotionRecord.getPromotionId())
                 .promotionName(promotionRecord.getPromotionName())
                 .commodityId(promotionRecord.getCommodityId())
+                .originalPrice(promotionRecord.getOriginalPrice())
+                .promotionalPrice(promotionRecord.getPromotionPrice())
                 .startTime(promotionRecord.getStartTime())
                 .endTime(promotionRecord.getEndTime())
                 .status(promotionRecord.getStatus())
