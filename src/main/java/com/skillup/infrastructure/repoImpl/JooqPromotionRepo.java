@@ -10,8 +10,6 @@ import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,7 +28,6 @@ public class JooqPromotionRepo implements PromotionRepository, StockOperation {
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRED)
     public PromotionDomain getPromotionById(String promotionId) {
         Optional<PromotionDomain> promotionDomainOptional = dslContext.selectFrom(PROMOTION_T).where(PROMOTION_T.PROMOTION_ID.eq(promotionId)).fetchOptional(this::toDomain);
         return promotionDomainOptional.orElse(null);
@@ -47,7 +44,6 @@ public class JooqPromotionRepo implements PromotionRepository, StockOperation {
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRED)
     public boolean lockPromotionStock(String promotionId) {
         /**
          * update promotion
@@ -117,8 +113,6 @@ public class JooqPromotionRepo implements PromotionRepository, StockOperation {
                 .promotionId(promotionRecord.getPromotionId())
                 .promotionName(promotionRecord.getPromotionName())
                 .commodityId(promotionRecord.getCommodityId())
-                .originalPrice(promotionRecord.getOriginalPrice())
-                .promotionalPrice(promotionRecord.getPromotionPrice())
                 .startTime(promotionRecord.getStartTime())
                 .endTime(promotionRecord.getEndTime())
                 .status(promotionRecord.getStatus())
