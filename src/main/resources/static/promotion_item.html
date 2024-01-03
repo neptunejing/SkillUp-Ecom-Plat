@@ -41,19 +41,19 @@ window.onload = function() {
 			var availableStock = data.availableStock;
 			$('#availableStock').html(availableStock);
 
-			document.getElementById('preview_img').src = "img/items/" + data.imageUrl + "/cover.jpg";
-			document.getElementById('preview_img').jqimg = "img/items/" + data.imageUrl + "/cover.jpg";
+			document.getElementById('preview_img').src = "img/items/" + data.imageURL + "/cover.jpg";
+			document.getElementById('preview_img').jqimg = "img/items/" + data.imageURL + "/cover.jpg";
 
 
-			document.getElementById('icon1').src = "img/items/" + data.imageUrl + "/icon1.jpg";
-			document.getElementById('icon2').src = "img/items/" + data.imageUrl + "/icon2.jpg";
-			document.getElementById('icon3').src = "img/items/" + data.imageUrl + "/icon3.jpg";
-			document.getElementById('icon4').src = "img/items/" + data.imageUrl + "/icon4.jpg";
-			document.getElementById('icon5').src = "img/items/" + data.imageUrl + "/icon5.jpg";
+			document.getElementById('icon1').src = "img/items/" + data.imageURL + "/icon1.jpg";
+			document.getElementById('icon2').src = "img/items/" + data.imageURL + "/icon2.jpg";
+			document.getElementById('icon3').src = "img/items/" + data.imageURL + "/icon3.jpg";
+			document.getElementById('icon4').src = "img/items/" + data.imageURL + "/icon4.jpg";
+			document.getElementById('icon5').src = "img/items/" + data.imageURL + "/icon5.jpg";
 
-			document.getElementById('banner1').src = "img/items/" + data.imageUrl + "/banner1.jpg";
-			document.getElementById('banner2').src = "img/items/" + data.imageUrl + "/banner2.jpg";
-			document.getElementById('banner3').src = "img/items/" + data.imageUrl + "/banner3.jpg";
+			document.getElementById('banner1').src = "img/items/" + data.imageURL + "/banner1.jpg";
+			document.getElementById('banner2').src = "img/items/" + data.imageURL + "/banner2.jpg";
+			document.getElementById('banner3').src = "img/items/" + data.imageURL + "/banner3.jpg";
 
 			commodityId = data.commodityId;
 			$.ajax({

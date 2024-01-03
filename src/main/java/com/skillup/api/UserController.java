@@ -2,7 +2,7 @@ package com.skillup.api;
 
 import com.skillup.api.dto.in.UserInDto;
 import com.skillup.api.dto.in.UserPin;
-import com.skillup.api.dto.out.UserOutDto;
+import com.skillup.api.dto.mapper.UserMapper;
 import com.skillup.api.util.SkillUpCommon;
 import com.skillup.api.util.SkillUpResponse;
 import com.skillup.domain.user.UserDomain;
@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/account")
@@ -23,8 +22,8 @@ public class UserController {
     @PostMapping()
     public ResponseEntity<SkillUpResponse> createUser(@RequestBody UserInDto userInDto) {
         try {
-            UserDomain userDomain = userService.createUser(toDomain(userInDto));
-            return ResponseEntity.status(SkillUpCommon.SUCCESS).body(SkillUpResponse.builder().result(toOutDto(userDomain)).build());
+            UserDomain userDomain = userService.createUser(UserMapper.INSTANCE.toDomain(userInDto));
+            return ResponseEntity.status(SkillUpCommon.SUCCESS).body(SkillUpResponse.builder().result(UserMapper.INSTANCE.toOutDto(userDomain)).build());
         } catch (Exception e) {
             return ResponseEntity.status(SkillUpCommon.BAD_REQUEST).body(SkillUpResponse.builder().msg(SkillUpCommon.USER_EXISTS).build());
         }
@@ -36,7 +35,7 @@ public class UserController {
         if (Objects.isNull(userDomain)) {
             return ResponseEntity.status(SkillUpCommon.BAD_REQUEST).body(SkillUpResponse.builder().msg(String.format(SkillUpCommon.USER_ID_WRONG, id)).build());
         }
-        return ResponseEntity.status(SkillUpCommon.SUCCESS).body(SkillUpResponse.builder().result(toOutDto(userDomain)).build());
+        return ResponseEntity.status(SkillUpCommon.SUCCESS).body(SkillUpResponse.builder().result(UserMapper.INSTANCE.toOutDto(userDomain)).build());
     }
 
     @GetMapping(value = "/name/{name}")
@@ -45,7 +44,7 @@ public class UserController {
         if (Objects.isNull(userDomain)) {
             return ResponseEntity.status(SkillUpCommon.BAD_REQUEST).body(SkillUpResponse.builder().msg(String.format(SkillUpCommon.USER_NAME_WRONG, name)).build());
         }
-        return ResponseEntity.status(SkillUpCommon.SUCCESS).body(SkillUpResponse.builder().result(toOutDto(userDomain)).build());
+        return ResponseEntity.status(SkillUpCommon.SUCCESS).body(SkillUpResponse.builder().result(UserMapper.INSTANCE.toOutDto(userDomain)).build());
     }
 
     @PostMapping(value = "/login")
@@ -57,7 +56,7 @@ public class UserController {
         if (!userDomain.getPassword().equals(userInDto.getPassword())) {
             return ResponseEntity.status(SkillUpCommon.BAD_REQUEST).body(SkillUpResponse.builder().msg(SkillUpCommon.PASSWORD_NOT_MATCH).build());
         }
-        return ResponseEntity.status(SkillUpCommon.SUCCESS).body(SkillUpResponse.builder().result(toOutDto(userDomain)).build());
+        return ResponseEntity.status(SkillUpCommon.SUCCESS).body(SkillUpResponse.builder().result(UserMapper.INSTANCE.toOutDto(userDomain)).build());
     }
 
     @PutMapping(value = "/password")
@@ -71,21 +70,6 @@ public class UserController {
         }
         userDomain.setPassword(userPin.getNewPassword());
         userService.updateUser(userDomain);
-        return ResponseEntity.status(SkillUpCommon.SUCCESS).body(SkillUpResponse.builder().result(toOutDto(userDomain)).build());
-    }
-
-    private UserDomain toDomain(UserInDto userInDto) {
-        return UserDomain.builder()
-                .userId(UUID.randomUUID().toString())
-                .userName(userInDto.getUserName())
-                .password(userInDto.getPassword())
-                .build();
-    }
-
-    private UserOutDto toOutDto(UserDomain userDomain) {
-        return UserOutDto.builder()
-                .userId(userDomain.getUserId())
-                .userName(userDomain.getUserName())
-                .build();
+        return ResponseEntity.status(SkillUpCommon.SUCCESS).body(SkillUpResponse.builder().result(UserMapper.INSTANCE.toOutDto(userDomain)).build());
     }
 }
