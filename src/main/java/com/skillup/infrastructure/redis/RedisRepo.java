@@ -1,8 +1,7 @@
 package com.skillup.infrastructure.redis;
 
 import com.alibaba.fastjson.JSON;
-import com.skillup.domain.promotion.PromotionCacheDomain;
-import com.skillup.domain.promotion.PromotionDomain;
+import com.skillup.domain.promotionCache.PromotionCacheDomain;
 import com.skillup.domain.promotionCache.PromotionCacheRepository;
 import com.skillup.domain.stock.StockDomain;
 import com.skillup.domain.stock.StockRepository;

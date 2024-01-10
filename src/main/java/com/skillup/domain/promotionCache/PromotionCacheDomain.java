@@ -1,4 +1,4 @@
-package com.skillup.domain.promotion;
+package com.skillup.domain.promotionCache;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,7 +1,6 @@
 package com.skillup.domain.promotionCache;
 
-import com.skillup.domain.promotion.PromotionCacheDomain;
-import com.skillup.domain.promotion.PromotionDomain;
+import com.skillup.domain.promotionCache.PromotionCacheDomain;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
