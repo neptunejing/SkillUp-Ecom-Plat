@@ -10,4 +10,6 @@ public interface PromotionCacheMapper {
     PromotionCacheMapper INSTANCE = Mappers.getMapper(PromotionCacheMapper.class);
 
     PromotionCacheDomain toCache(PromotionDomain promotionDomain);
+
+    PromotionDomain toDomain(PromotionCacheDomain promotionCacheDomain);
 }
