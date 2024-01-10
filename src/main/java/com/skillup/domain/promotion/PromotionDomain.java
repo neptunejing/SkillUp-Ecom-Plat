@@ -19,7 +19,7 @@ public class PromotionDomain {
     private int promotionalPrice;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private int status;
+    private int status; // 0: not started; 1: ongoing; 2: expired
     private long totalStock;
     private long availableStock;
     private long lockStock;
