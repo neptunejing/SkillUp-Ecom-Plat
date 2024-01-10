@@ -1,7 +1,7 @@
 package com.skillup.api;
 
 import com.skillup.api.dto.in.CommodityInDto;
-import com.skillup.api.dto.mapper.CommodityMapper;
+import com.skillup.api.mapper.CommodityMapper;
 import com.skillup.api.util.SkillUpCommon;
 import com.skillup.api.util.SkillUpResponse;
 import com.skillup.domain.commodity.CommodityDomain;

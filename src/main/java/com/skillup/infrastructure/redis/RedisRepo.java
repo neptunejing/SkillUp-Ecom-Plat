@@ -1,6 +1,9 @@
 package com.skillup.infrastructure.redis;
 
 import com.alibaba.fastjson.JSON;
+import com.skillup.domain.promotion.PromotionCacheDomain;
+import com.skillup.domain.promotion.PromotionDomain;
+import com.skillup.domain.promotionCache.PromotionCacheRepository;
 import com.skillup.domain.stock.StockDomain;
 import com.skillup.domain.stock.StockRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Objects;
 
 @Repository
-public class RedisRepo implements StockRepository {
+public class RedisRepo implements StockRepository, PromotionCacheRepository {
     @Autowired
     RedisTemplate<String, String> redisTemplate;
 
@@ -43,5 +46,15 @@ public class RedisRepo implements StockRepository {
     public void setPromotionAvailableStock(String promotionId, Long availableStock) {
         String key = StockDomain.createStockKey(promotionId);
         set(key, availableStock);
+    }
+
+    @Override
+    public void setPromotionCache(PromotionCacheDomain promotionCache) {
+        set(promotionCache.getPromotionId(), promotionCache);
+    }
+
+    @Override
+    public PromotionCacheDomain getPromotionById(String promotionId) {
+        return JSON.parseObject(get(promotionId), PromotionCacheDomain.class);
     }
 }

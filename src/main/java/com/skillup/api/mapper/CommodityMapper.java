@@ -1,4 +1,4 @@
-package com.skillup.api.dto.mapper;
+package com.skillup.api.mapper;
 
 import com.skillup.api.dto.in.CommodityInDto;
 import com.skillup.api.dto.out.CommodityOutDto;

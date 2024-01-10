@@ -1,7 +1,7 @@
 package com.skillup.api;
 
 import com.skillup.api.dto.in.PromotionInDto;
-import com.skillup.api.dto.mapper.PromotionMapper;
+import com.skillup.api.mapper.PromotionMapper;
 import com.skillup.api.dto.out.PromotionOutDto;
 import com.skillup.api.util.SkillUpCommon;
 import com.skillup.domain.promotion.PromotionDomain;
