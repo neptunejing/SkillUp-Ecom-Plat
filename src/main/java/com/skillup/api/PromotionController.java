@@ -7,6 +7,8 @@ import com.skillup.api.util.SkillUpCommon;
 import com.skillup.application.promotion.PromotionApplication;
 import com.skillup.domain.promotion.PromotionDomain;
 import com.skillup.domain.promotion.PromotionService;
+import com.skillup.domain.stock.StockDomain;
+import com.skillup.domain.stock.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,9 @@ public class PromotionController {
 
     @Autowired
     PromotionApplication promotionApplication;
+
+    @Autowired
+    StockService stockService;
 
     @PostMapping()
     public ResponseEntity<PromotionOutDto> createPromotion(@RequestBody PromotionInDto promotionInDto) {
@@ -52,11 +57,12 @@ public class PromotionController {
 
     @PostMapping("/lock/id/{id}")
     public ResponseEntity<Boolean> lockPromotionStock(@PathVariable("id") String promotionId) {
-        PromotionDomain promotionDomain = promotionService.getPromotionById(promotionId);
+        PromotionDomain promotionDomain = promotionApplication.getPromotionById(promotionId);
         if (Objects.isNull(promotionDomain)) {
             return ResponseEntity.status(SkillUpCommon.BAD_REQUEST).body(false);
         }
-        boolean isLocked = promotionService.lockPromotionStock(promotionId);
+        StockDomain stockDomain = StockDomain.builder().promotionId(promotionId).build();
+        boolean isLocked = stockService.lockAvailableStock(stockDomain);
         if (isLocked) {
             return ResponseEntity.status(SkillUpCommon.SUCCESS).body(true);
         }

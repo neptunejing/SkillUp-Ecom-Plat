@@ -6,15 +6,22 @@ import com.skillup.domain.promotionCache.PromotionCacheRepository;
 import com.skillup.domain.stock.StockDomain;
 import com.skillup.domain.stock.StockRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 @Repository
 public class RedisRepo implements StockRepository, PromotionCacheRepository {
     @Autowired
     RedisTemplate<String, String> redisTemplate;
+
+    @Autowired
+    @Qualifier("lockStockScript")
+    DefaultRedisScript<Long> redisLockScript;
 
     public void set(String key, Object value) {
         redisTemplate.opsForValue().set(key, JSON.toJSONString(value));
@@ -27,7 +34,17 @@ public class RedisRepo implements StockRepository, PromotionCacheRepository {
 
     @Override
     public boolean lockAvailableStock(StockDomain stockDomain) {
-        return false;
+        try {
+            Long stock = redisTemplate.execute(redisLockScript, Arrays.asList(StockDomain.createStockKey(stockDomain.getPromotionId())));
+            if (stock >= 0) {
+                return true;
+            } else {
+                // -1: sold out; -2: promotion doesn't exist
+                return false;
+            }
+        } catch (Throwable throwable) {
+            throw new RuntimeException(throwable);
+        }
     }
 
     @Override
