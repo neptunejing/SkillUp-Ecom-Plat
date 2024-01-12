@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class UserPin {
-    private String  userName;
+    private String userName;
     private String oldPassword;
     private String newPassword;
 }

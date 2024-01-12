@@ -2,7 +2,7 @@ package com.skillup.api;
 
 import com.skillup.api.dto.in.UserInDto;
 import com.skillup.api.dto.in.UserPin;
-import com.skillup.api.dto.mapper.UserMapper;
+import com.skillup.api.mapper.UserMapper;
 import com.skillup.api.util.SkillUpCommon;
 import com.skillup.api.util.SkillUpResponse;
 import com.skillup.domain.user.UserDomain;

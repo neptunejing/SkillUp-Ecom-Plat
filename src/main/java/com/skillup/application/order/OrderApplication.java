@@ -1,4 +1,4 @@
-package com.skillup.application;
+package com.skillup.application.order;
 
 import com.skillup.domain.order.OrderDomain;
 import com.skillup.domain.order.OrderService;

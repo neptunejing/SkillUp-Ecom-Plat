@@ -1,4 +1,4 @@
-package com.skillup.api.dto.mapper;
+package com.skillup.api.mapper;
 
 import com.skillup.api.dto.in.PromotionInDto;
 import com.skillup.api.dto.out.PromotionOutDto;

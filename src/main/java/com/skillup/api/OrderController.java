@@ -4,7 +4,7 @@ import com.skillup.api.dto.in.OrderInDto;
 import com.skillup.api.dto.out.OrderOutDto;
 import com.skillup.api.util.SkillUpCommon;
 import com.skillup.api.util.Snowflake;
-import com.skillup.application.OrderApplication;
+import com.skillup.application.order.OrderApplication;
 import com.skillup.domain.order.OrderDomain;
 import com.skillup.domain.order.OrderService;
 import com.skillup.domain.order.util.OrderStatus;
