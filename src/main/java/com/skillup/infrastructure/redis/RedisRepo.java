@@ -23,6 +23,10 @@ public class RedisRepo implements StockRepository, PromotionCacheRepository {
     @Qualifier("lockStockScript")
     DefaultRedisScript<Long> redisLockScript;
 
+    @Autowired
+    @Qualifier("revertStockScript")
+    DefaultRedisScript<Long> redisRevertScript;
+
     public void set(String key, Object value) {
         redisTemplate.opsForValue().set(key, JSON.toJSONString(value));
     }
@@ -49,7 +53,16 @@ public class RedisRepo implements StockRepository, PromotionCacheRepository {
 
     @Override
     public boolean revertAvailableStock(StockDomain stockDomain) {
-        return false;
+        try {
+            Long stock = redisTemplate.execute(redisRevertScript, Arrays.asList(StockDomain.createStockKey(stockDomain.getPromotionId())));
+            if (stock > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Throwable throwable) {
+            throw new RuntimeException(throwable);
+        }
     }
 
     @Override

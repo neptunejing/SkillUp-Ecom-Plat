@@ -85,11 +85,12 @@ public class PromotionController {
 
     @PostMapping("revert/id/{id}")
     public ResponseEntity<Boolean> revertPromotionStock(@PathVariable("id") String promotionId) {
-        PromotionDomain promotionDomain = promotionService.getPromotionById(promotionId);
+        PromotionDomain promotionDomain = promotionApplication.getPromotionById(promotionId);
         if (Objects.isNull(promotionDomain)) {
             return ResponseEntity.status(SkillUpCommon.BAD_REQUEST).body(false);
         }
-        boolean isReverted = promotionService.revertPromotionStock(promotionId);
+        StockDomain stockDomain = StockDomain.builder().promotionId(promotionId).build();
+        boolean isReverted = stockService.revertAvailableStock(stockDomain);
         if (isReverted) {
             return ResponseEntity.status(SkillUpCommon.SUCCESS).body(true);
         }

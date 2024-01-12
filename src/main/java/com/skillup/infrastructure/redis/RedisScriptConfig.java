@@ -16,4 +16,12 @@ public class RedisScriptConfig {
         redisScript.setResultType(Long.class);
         return redisScript;
     }
+
+    @Bean(value = "revertStockScript")
+    DefaultRedisScript<Long> revertStickScript() {
+        DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
+        redisScript.setScriptSource(new ResourceScriptSource(new ClassPathResource("redis/revertStock.lua")));
+        redisScript.setResultType(Long.class);
+        return redisScript;
+    }
 }
