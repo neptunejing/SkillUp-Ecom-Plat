@@ -28,7 +28,7 @@ spring:
 
 # Custom Config
 promotion:
-  stock-strategy: overall # [overall, sync, optimistic]
+  stock-strategy: optimistic # [overall, sync, optimistic]
   topic:
     lock-stock: lock-stock
     lock-stock-group: LS-G

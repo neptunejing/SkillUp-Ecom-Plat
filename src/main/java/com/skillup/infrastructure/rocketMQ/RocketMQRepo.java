@@ -22,7 +22,7 @@ public class RocketMQRepo implements MQSendRepo {
         // 2. send msg to related topic
         try {
             rocketMQTemplate.getProducer().send(message);
-            log.info("-- send a message to rocketMQ --");
+            log.info("-- send a message to rocketMQ. Topic: " + topic + " --");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
