@@ -19,4 +19,9 @@ public class OrderService {
     public OrderDomain getOrderById(Long orderId) {
         return orderRepository.getOrderById(orderId);
     }
+
+    public OrderDomain updateOrder(OrderDomain orderDomain) {
+        orderRepository.updateOrder(orderDomain);
+        return orderDomain;
+    }
 }

@@ -27,6 +27,9 @@ public class CreateOrderConsumer implements RocketMQListener<MessageExt> {
     @Value("${promotion.topic.lock-stock}")
     String lockStockTopic;
 
+    @Value("${order.topic.pay-check}")
+    String payCheckTopic;
+
     @Override
     public void onMessage(MessageExt messageExt) {
         String messageBody = new String(messageExt.getBody(), StandardCharsets.UTF_8);
@@ -38,6 +41,8 @@ public class CreateOrderConsumer implements RocketMQListener<MessageExt> {
         mqSendRepo.sendMsgToTopic(lockStockTopic, JSON.toJSONString(orderDomain));
         log.info("OrderApp: sent lock-stock message. OrderId: " + orderDomain.getOrderNumber());
 
-        // TODO: 3. send a 'pay-check' message
+        // 3. send a 'pay-check' message
+        mqSendRepo.sendDelayMsgToTopic(payCheckTopic, JSON.toJSONString(orderDomain));
+        log.info("OrderApp: sent pay-check message. OrderId: " + orderDomain.getOrderNumber());
     }
 }
