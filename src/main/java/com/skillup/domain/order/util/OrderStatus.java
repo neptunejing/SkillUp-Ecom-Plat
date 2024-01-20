@@ -7,7 +7,7 @@ public enum OrderStatus {
     OUT_OF_STOCK(-1), // promotion out of stock
     READY(0), // preorder
     CREATED(1), // waiting to pay
-    PAYED(2), // paid
+    PAID(2), // paid
     OVERTIME(3); // invalid or expired order
 
     public final Integer code;
@@ -21,7 +21,7 @@ public enum OrderStatus {
         put(-1, OUT_OF_STOCK);
         put(0, READY);
         put(1, CREATED);
-        put(2, PAYED);
+        put(2, PAID);
         put(3, OVERTIME);
     }};
 }

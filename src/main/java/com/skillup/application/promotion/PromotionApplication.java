@@ -5,7 +5,6 @@ import com.skillup.domain.promotionCache.PromotionCacheDomain;
 import com.skillup.domain.promotion.PromotionDomain;
 import com.skillup.domain.promotion.PromotionService;
 import com.skillup.domain.promotionCache.PromotionCacheService;
-import com.skillup.domain.stock.StockDomain;
 import com.skillup.domain.stock.StockService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

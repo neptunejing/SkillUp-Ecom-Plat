@@ -57,7 +57,7 @@ public class PayCheckConsumer implements RocketMQListener<MessageExt> {
 
             // 2.3 revert DB stock by MQ
             mqSendRepo.sendMsgToTopic(revertStockTopic, JSON.toJSONString(orderDomain));
-        } else if (currOrderStatus.equals(OrderStatus.PAYED)) {
+        } else if (currOrderStatus.equals(OrderStatus.PAID)) {
             // 3. paid successfully: stock should be deducted once the payment was done
             log.info("Order (Id: " + orderDomain.getOrderNumber() + ") has been paid successfully");
         } else if (currOrderStatus.equals(OrderStatus.OVERTIME)) {

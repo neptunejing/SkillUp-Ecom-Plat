@@ -33,6 +33,9 @@ public class OrderApplication {
     @Value("${order.topic.create-order}")
     String createOrderTopic;
 
+    @Value("${promotion.topic.deduct-stock}")
+    String deductStockTopic;
+
     @Transactional
     public OrderDomain createBuyNowOrder(OrderDomain orderDomain) {
         // 1. check if a promotion id exists in promotion cache
@@ -54,5 +57,32 @@ public class OrderApplication {
         // 4. send a message to MQ
         mqSendRepo.sendMsgToTopic(createOrderTopic, JSON.toJSONString(orderDomain));
         return orderDomain;
+    }
+
+    public OrderDomain payBuyNowOrder(Long orderNumber, Integer existStatus, Integer expectStatus) {
+        OrderDomain orderDomain = orderService.getOrderById(orderNumber);
+        if (Objects.isNull(orderDomain)) return null;
+
+        // verify the request
+        if (!existStatus.equals(OrderStatus.CREATED.code) || !expectStatus.equals(OrderStatus.PAID.code)) {
+            return orderDomain;
+        }
+
+        if (existStatus.equals(orderDomain.getOrderStatus().code)) {
+            boolean isPaid = thirdPartyPayment();
+            if (!isPaid) return orderDomain;
+
+            orderDomain.setOrderStatus(OrderStatus.PAID);
+            orderDomain.setPayTime(LocalDateTime.now());
+            orderService.updateOrder(orderDomain);
+
+            // deduct DB stock by MQ
+            mqSendRepo.sendMsgToTopic(deductStockTopic, JSON.toJSONString(orderDomain));
+        }
+        return orderDomain;
+    }
+
+    private boolean thirdPartyPayment() {
+        return true;
     }
 }

@@ -1,6 +1,7 @@
 package com.skillup.api;
 
 import com.skillup.api.dto.in.OrderInDto;
+import com.skillup.api.dto.in.OrderStatusInDto;
 import com.skillup.api.dto.out.OrderOutDto;
 import com.skillup.api.util.SkillUpCommon;
 import com.skillup.api.util.Snowflake;
@@ -44,9 +45,23 @@ public class OrderController {
     }
 
     @PatchMapping("/pay")
-    public ResponseEntity<OrderOutDto> payBuyNowOrder(@RequestBody OrderInDto orderInDto) {
-        return null;
-
+    public ResponseEntity<OrderOutDto> payBuyNowOrder(@RequestBody OrderStatusInDto orderStatusInDto) {
+        OrderDomain orderDomain = orderApplication.payBuyNowOrder(orderStatusInDto.getOrderNumber(), orderStatusInDto.getExistStatus(), orderStatusInDto.getExpectStatus());
+        if (Objects.isNull(orderDomain)) {
+            return ResponseEntity.status(SkillUpCommon.BAD_REQUEST).body(null);
+        }
+        OrderStatus orderStatus = orderDomain.getOrderStatus();
+        if (orderStatus.equals(OrderStatus.PAID)) {
+            return ResponseEntity.status(SkillUpCommon.SUCCESS).body(toOutDto(orderDomain));
+        }
+        if (orderStatus.equals(OrderStatus.CREATED)) {
+            return ResponseEntity.status(SkillUpCommon.INTERNAL_ERROR).body(toOutDto(orderDomain));
+        }
+        if (orderStatus.equals(OrderStatus.OVERTIME)) {
+            return ResponseEntity.status(SkillUpCommon.BAD_REQUEST).body(toOutDto(orderDomain));
+        } else {
+            return ResponseEntity.status(SkillUpCommon.INTERNAL_ERROR).body(toOutDto(orderDomain));
+        }
     }
 
     private OrderDomain toDomain(OrderInDto orderInDto) {
