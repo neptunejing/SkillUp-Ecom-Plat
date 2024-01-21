@@ -26,12 +26,15 @@ public class JooqOrderRepo implements OrderRepository {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public OrderDomain getOrderById(Long orderId) {
-        return dslContext.selectFrom(ORDER_T).where(ORDER_T.ORDER_NUMBER.eq(orderId)).fetchOptional(this::toDomain).orElse(null);
+        // return dslContext.selectFrom(ORDER_T).where(ORDER_T.ORDER_NUMBER.eq(orderId)).fetchOptional(this::toDomain).orElse(null);
+        return dslContext.selectFrom(ORDER_T).where(ORDER_T.ORDER_NUMBER.eq(orderId)).forUpdate().fetchOptional(this::toDomain).orElse(null);
     }
 
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public void updateOrder(OrderDomain orderDomain) {
         dslContext.executeUpdate(toRecord(orderDomain));
     }

@@ -59,6 +59,7 @@ public class OrderApplication {
         return orderDomain;
     }
 
+    @Transactional
     public OrderDomain payBuyNowOrder(Long orderNumber, Integer existStatus, Integer expectStatus) {
         OrderDomain orderDomain = orderService.getOrderById(orderNumber);
         if (Objects.isNull(orderDomain)) return null;
