@@ -5,19 +5,14 @@ import com.skillup.application.order.MQSendRepo;
 import com.skillup.domain.order.OrderDomain;
 import com.skillup.domain.order.OrderService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.rocketmq.common.message.MessageExt;
-import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
-import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
-
-import java.nio.charset.StandardCharsets;
 
 @Component
 @Slf4j
-@RocketMQMessageListener(topic = "${order.topic.create-order}", consumerGroup = "${order.topic.create-order-group}")
-public class CreateOrderConsumer implements RocketMQListener<MessageExt> {
+public class CreateOrderEventHandler implements ApplicationListener<CreateOrderEvent> {
     @Autowired
     OrderService orderService;
 
@@ -31,9 +26,8 @@ public class CreateOrderConsumer implements RocketMQListener<MessageExt> {
     String payCheckTopic;
 
     @Override
-    public void onMessage(MessageExt messageExt) {
-        String messageBody = new String(messageExt.getBody(), StandardCharsets.UTF_8);
-        OrderDomain orderDomain = JSON.parseObject(messageBody, OrderDomain.class);
+    public void onApplicationEvent(CreateOrderEvent event) {
+        OrderDomain orderDomain = event.orderDomain;
         // 1. save an order to DB
         orderService.createOrder(orderDomain);
         // write stock info back to DB: step 2 and 3 send single messages to two 2 separate listeners
