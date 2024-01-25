@@ -3,6 +3,7 @@ package com.skillup.infrastructure.rocketMQ.consumer;
 import com.alibaba.fastjson.JSON;
 import com.skillup.application.order.consumer.CreateOrderEvent;
 import com.skillup.domain.order.OrderDomain;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.nio.charset.StandardCharsets;
 
 @Component
+@Slf4j
 @RocketMQMessageListener(topic = "${order.topic.create-order}", consumerGroup = "${order.topic.create-order-group}")
 public class CreateOrderConsumer implements RocketMQListener<MessageExt> {
     @Autowired
@@ -29,6 +31,7 @@ public class CreateOrderConsumer implements RocketMQListener<MessageExt> {
     public void onMessage(MessageExt messageExt) {
         String messageBody = new String(messageExt.getBody(), StandardCharsets.UTF_8);
         OrderDomain orderDomain = JSON.parseObject(messageBody, OrderDomain.class);
+        log.info("CreateOrderConsumer: received create-order message. OrderId: " + orderDomain.getOrderNumber());
         // create event
         CreateOrderEvent createOrderEvent = new CreateOrderEvent(this, orderDomain);
         // publish event

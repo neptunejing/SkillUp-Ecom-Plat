@@ -7,6 +7,7 @@ package com.skillup.infrastructure.jooq;
 import com.skillup.infrastructure.jooq.tables.Commodity;
 import com.skillup.infrastructure.jooq.tables.Order;
 import com.skillup.infrastructure.jooq.tables.Promotion;
+import com.skillup.infrastructure.jooq.tables.PromotionLog;
 import com.skillup.infrastructure.jooq.tables.User;
 
 
@@ -30,6 +31,11 @@ public class Tables {
      * The table <code>skillup.promotion</code>.
      */
     public static final Promotion PROMOTION = Promotion.PROMOTION;
+
+    /**
+     * The table <code>skillup.promotion_log</code>.
+     */
+    public static final PromotionLog PROMOTION_LOG = PromotionLog.PROMOTION_LOG;
 
     /**
      * The table <code>skillup.user</code>.
