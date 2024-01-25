@@ -21,12 +21,6 @@ public class CreateOrderConsumer implements RocketMQListener<MessageExt> {
     @Autowired
     ApplicationContext applicationContext;
 
-    @Value("${promotion.topic.lock-stock}")
-    String lockStockTopic;
-
-    @Value("${order.topic.pay-check}")
-    String payCheckTopic;
-
     @Override
     public void onMessage(MessageExt messageExt) {
         String messageBody = new String(messageExt.getBody(), StandardCharsets.UTF_8);

@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @Component
 @Slf4j
 public class CreateOrderEventHandler implements ApplicationListener<CreateOrderEvent> {
@@ -29,6 +31,11 @@ public class CreateOrderEventHandler implements ApplicationListener<CreateOrderE
     public void onApplicationEvent(CreateOrderEvent event) {
         OrderDomain orderDomain = event.orderDomain;
         // 1. save an order to DB
+        OrderDomain savedOrderDomain = orderService.getOrderById(orderDomain.getOrderNumber());
+        if (!Objects.isNull(savedOrderDomain)) {
+            // keep idempotent
+            return;
+        }
         orderService.createOrder(orderDomain);
         // write stock info back to DB: step 2 and 3 send single messages to two 2 separate listeners
         // 2. send a 'lock-stock' message
