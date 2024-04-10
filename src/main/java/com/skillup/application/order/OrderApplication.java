@@ -6,6 +6,10 @@ import com.skillup.domain.order.OrderDomain;
 import com.skillup.domain.order.OrderService;
 import com.skillup.domain.order.util.OrderStatus;
 import com.skillup.domain.promotion.PromotionDomain;
+import com.skillup.domain.promotionStockLog.PromotionStockLogDomain;
+import com.skillup.domain.promotionStockLog.PromotionStockLogService;
+import com.skillup.domain.promotionStockLog.util.OperationName;
+import com.skillup.domain.promotionStockLog.util.OperationStatus;
 import com.skillup.domain.stock.StockDomain;
 import com.skillup.domain.stock.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,34 +32,29 @@ public class OrderApplication {
     StockService stockService;
 
     @Autowired
+    PromotionStockLogService promotionStockLogService;
+
+    @Autowired
     MQSendRepo mqSendRepo;
 
     @Value("${order.topic.create-order}")
     String createOrderTopic;
 
-    @Value("${promotion.topic.deduct-stock}")
-    String deductStockTopic;
+    @Value("${order.topic.pay-order}")
+    String payOrderTopic;
 
     @Transactional
     public OrderDomain createBuyNowOrder(OrderDomain orderDomain) {
-        // 1. check if a promotion id exists in promotion cache
+        // check if a promotion id exists in promotion cache
         PromotionDomain promotionDomain = promotionApplication.getPromotionById(orderDomain.getPromotionId());
         if (Objects.isNull(promotionDomain)) {
             orderDomain.setOrderStatus(OrderStatus.ITEM_ERROR);
             return orderDomain;
         }
-        // 2. lock cached promotion stock
-        StockDomain stockDomain = StockDomain.builder().promotionId(orderDomain.getPromotionId()).build();
-        boolean isLocked = stockService.lockAvailableStock(stockDomain);
-        if (!isLocked) {
-            orderDomain.setOrderStatus(OrderStatus.OUT_OF_STOCK);
-            return orderDomain;
-        }
-        // 3. create an order
-        orderDomain.setCreateTime(LocalDateTime.now());
-        orderDomain.setOrderStatus(OrderStatus.CREATED);
-        // 4. send a message to MQ
-        mqSendRepo.sendMsgToTopic(createOrderTopic, JSON.toJSONString(orderDomain));
+        // 新建流水记录: LOCK_STOCK
+        promotionStockLogService.createPromotionStockLog(toPromotionStockLogDomain(orderDomain, OperationName.LOCK_STOCK));
+        // send a message to MQ
+        mqSendRepo.sendTxnMsg(createOrderTopic, JSON.toJSONString(orderDomain));
         return orderDomain;
     }
 
@@ -69,21 +68,29 @@ public class OrderApplication {
             return orderDomain;
         }
 
+        // 新建流水记录: DEDUCT_STOCK
+        promotionStockLogService.createPromotionStockLog(toPromotionStockLogDomain(orderDomain, OperationName.DEDUCT_STOCK));
         if (existStatus.equals(orderDomain.getOrderStatus().code)) {
-            boolean isPaid = thirdPartyPayment();
-            if (!isPaid) return orderDomain;
-
-            orderDomain.setOrderStatus(OrderStatus.PAID);
-            orderDomain.setPayTime(LocalDateTime.now());
-            orderService.updateOrder(orderDomain);
-
-            // deduct DB stock by MQ
-            mqSendRepo.sendMsgToTopic(deductStockTopic, JSON.toJSONString(orderDomain));
+            mqSendRepo.sendTxnMsg(payOrderTopic, JSON.toJSONString(orderDomain));
         }
+        // mock 异步支付延迟
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        orderDomain = orderService.getOrderById(orderNumber);
         return orderDomain;
     }
 
-    private boolean thirdPartyPayment() {
-        return true;
+    private PromotionStockLogDomain toPromotionStockLogDomain(OrderDomain orderDomain, OperationName operationName) {
+        return PromotionStockLogDomain.builder()
+                .promotionId(orderDomain.getPromotionId())
+                .orderNumber(orderDomain.getOrderNumber())
+                .userId(orderDomain.getUserId())
+                .operationName(operationName)
+                .createTime(LocalDateTime.now())
+                .status(OperationStatus.INIT)
+                .build();
     }
 }

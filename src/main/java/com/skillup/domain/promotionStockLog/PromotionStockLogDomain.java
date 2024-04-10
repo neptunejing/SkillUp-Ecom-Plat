@@ -1,6 +1,7 @@
 package com.skillup.domain.promotionStockLog;
 
 import com.skillup.domain.promotionStockLog.util.OperationName;
+import com.skillup.domain.promotionStockLog.util.OperationStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,4 +19,5 @@ public class PromotionStockLogDomain {
     private String promotionId;
     private OperationName operationName;
     private LocalDateTime createTime;
+    private OperationStatus status;
 }

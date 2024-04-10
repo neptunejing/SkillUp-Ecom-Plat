@@ -1,10 +1,11 @@
-package com.skillup.application.order.consumer;
+package com.skillup.application.order.consumer.payCheck;
 
 import com.alibaba.fastjson.JSON;
 import com.skillup.application.order.MQSendRepo;
 import com.skillup.domain.order.OrderDomain;
 import com.skillup.domain.order.OrderService;
 import com.skillup.domain.order.util.OrderStatus;
+import com.skillup.domain.promotion.PromotionService;
 import com.skillup.domain.stock.StockDomain;
 import com.skillup.domain.stock.StockService;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +13,6 @@ import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,8 +32,8 @@ public class PayCheckConsumer implements RocketMQListener<MessageExt> {
     @Autowired
     StockService stockService;
 
-    @Value("${promotion.topic.revert-stock}")
-    String revertStockTopic;
+    @Autowired
+    PromotionService promotionService;
 
     @Override
     @Transactional
@@ -58,7 +58,7 @@ public class PayCheckConsumer implements RocketMQListener<MessageExt> {
             stockService.revertAvailableStock(stockDomain);
 
             // 2.3 revert DB stock by MQ
-            mqSendRepo.sendMsgToTopic(revertStockTopic, JSON.toJSONString(orderDomain));
+            promotionService.revertPromotionStock(orderDomain.getPromotionId());
         } else if (currOrderStatus.equals(OrderStatus.PAID)) {
             // 3. paid successfully: stock should be deducted once the payment was done
             log.info("Order (Id: " + orderDomain.getOrderNumber() + ") has been paid successfully");

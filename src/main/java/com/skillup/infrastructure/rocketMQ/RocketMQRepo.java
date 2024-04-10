@@ -2,10 +2,12 @@ package com.skillup.infrastructure.rocketMQ;
 
 import com.skillup.application.order.MQSendRepo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.client.producer.TransactionSendResult;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Repository;
 
 import java.nio.charset.StandardCharsets;
@@ -41,6 +43,18 @@ public class RocketMQRepo implements MQSendRepo {
         try {
             rocketMQTemplate.getProducer().send(message);
             log.info("-- send a delayed message to rocketMQ. Topic: " + topic + " --");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public TransactionSendResult sendTxnMsg(String topic, String originMsg) {
+        try {
+            TransactionSendResult result = rocketMQTemplate.sendMessageInTransaction(topic, MessageBuilder.withPayload(originMsg)
+                    .setHeader("TXN_MESSAGE_HEADER", topic).build(), null);
+            log.info("-- send a transactional message to rocketMQ. Topic: " + topic + " --");
+            return result;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

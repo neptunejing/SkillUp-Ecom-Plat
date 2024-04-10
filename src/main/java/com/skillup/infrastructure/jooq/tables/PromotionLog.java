@@ -18,7 +18,7 @@ import org.jooq.ForeignKey;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row5;
+import org.jooq.Row6;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -74,6 +74,11 @@ public class PromotionLog extends TableImpl<PromotionLogRecord> {
      * The column <code>skillup.promotion_log.create_time</code>.
      */
     public final TableField<PromotionLogRecord, LocalDateTime> CREATE_TIME = createField(DSL.name("create_time"), SQLDataType.LOCALDATETIME(0).nullable(false), this, "");
+
+    /**
+     * The column <code>skillup.promotion_log.status</code>.
+     */
+    public final TableField<PromotionLogRecord, Integer> STATUS = createField(DSL.name("status"), SQLDataType.INTEGER.nullable(false), this, "");
 
     private PromotionLog(Name alias, Table<PromotionLogRecord> aliased) {
         this(alias, aliased, null);
@@ -155,11 +160,11 @@ public class PromotionLog extends TableImpl<PromotionLogRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row5 type methods
+    // Row6 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row5<Long, String, String, String, LocalDateTime> fieldsRow() {
-        return (Row5) super.fieldsRow();
+    public Row6<Long, String, String, String, LocalDateTime, Integer> fieldsRow() {
+        return (Row6) super.fieldsRow();
     }
 }

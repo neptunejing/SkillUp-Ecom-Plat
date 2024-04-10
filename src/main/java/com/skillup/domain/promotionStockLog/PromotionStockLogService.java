@@ -17,6 +17,12 @@ public class PromotionStockLogService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
+    public PromotionStockLogDomain updatePromotionStockLog(PromotionStockLogDomain promotionStockLogDomain) {
+        promotionStockLogRepo.updatePromotionStockLog(promotionStockLogDomain);
+        return promotionStockLogDomain;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
     public PromotionStockLogDomain getLogByOrderIdAndOperation(Long orderId, String operationName) {
         return promotionStockLogRepo.getLogByOrderIdAndOperation(orderId, operationName);
     }

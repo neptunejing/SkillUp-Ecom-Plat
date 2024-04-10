@@ -42,6 +42,8 @@ order:
   topic:
     create-order: create-order-1
     create-order-group: CO-G-1
+    pay-order: pay-order-1
+    pay-order-group: PO-G-1
     pay-check: pay-check-1
     pay-check-group: PC-G-1
   delay-time: 60

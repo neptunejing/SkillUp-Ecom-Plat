@@ -5,7 +5,8 @@ CREATE TABLE promotion_log
     promotion_id   VARCHAR(36) NOT NULL,
     operation_name VARCHAR(36) NOT NULL,
     create_time    TIMESTAMP   NOT NULL,
-    PRIMARY KEY (order_number, operation_name)
+    status         INT         NOT NULL,
+    PRIMARY KEY (order_number, operation_name, status)
 ) ENGINE = InnoDB
   CHARSET = utf8mb4;
 

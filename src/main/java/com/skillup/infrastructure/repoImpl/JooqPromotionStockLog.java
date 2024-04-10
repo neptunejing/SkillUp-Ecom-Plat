@@ -3,6 +3,7 @@ package com.skillup.infrastructure.repoImpl;
 import com.skillup.domain.promotionStockLog.PromotionStockLogDomain;
 import com.skillup.domain.promotionStockLog.PromotionStockLogRepo;
 import com.skillup.domain.promotionStockLog.util.OperationName;
+import com.skillup.domain.promotionStockLog.util.OperationStatus;
 import com.skillup.infrastructure.jooq.tables.PromotionLog;
 import com.skillup.infrastructure.jooq.tables.records.PromotionLogRecord;
 import org.jooq.DSLContext;
@@ -25,6 +26,11 @@ public class JooqPromotionStockLog implements PromotionStockLogRepo {
     }
 
     @Override
+    public void updatePromotionStockLog(PromotionStockLogDomain promotionStockLogDomain) {
+        dslContext.executeUpdate(toRecord(promotionStockLogDomain));
+    }
+
+    @Override
     public PromotionStockLogDomain getLogByOrderIdAndOperation(Long orderId, String operationName) {
         return dslContext.selectFrom(PROMOTION_LOG_T).where(PROMOTION_LOG_T.ORDER_NUMBER.eq(orderId).and(PROMOTION_LOG_T.OPERATION_NAME.eq(operationName)))
                 .fetchOptional(this::toDomain).orElse(null);
@@ -36,7 +42,8 @@ public class JooqPromotionStockLog implements PromotionStockLogRepo {
                 promotionStockLogDomain.getUserId(),
                 promotionStockLogDomain.getPromotionId(),
                 promotionStockLogDomain.getOperationName().toString(),
-                promotionStockLogDomain.getCreateTime()
+                promotionStockLogDomain.getCreateTime(),
+                promotionStockLogDomain.getStatus().code
         );
     }
 
@@ -47,6 +54,7 @@ public class JooqPromotionStockLog implements PromotionStockLogRepo {
                 .promotionId(promotionLogRecord.getPromotionId())
                 .operationName(OperationName.valueOf(promotionLogRecord.getOperationName()))
                 .createTime(promotionLogRecord.getCreateTime())
+                .status(OperationStatus.CACHE.get(promotionLogRecord.getStatus()))
                 .build();
     }
 }
