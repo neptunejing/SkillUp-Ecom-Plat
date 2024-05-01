@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.skillup.application.order.MQSendRepo;
 import com.skillup.domain.order.OrderDomain;
 import com.skillup.domain.order.OrderService;
+import com.skillup.domain.order.util.OrderStatus;
 import com.skillup.domain.promotion.PromotionService;
 import com.skillup.domain.promotionStockLog.PromotionStockLogDomain;
 import com.skillup.domain.promotionStockLog.PromotionStockLogService;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 
 @Component
 @Slf4j
@@ -45,15 +47,22 @@ public class CreateOrderConsumer implements RocketMQListener<MessageExt> {
         String messageBody = new String(messageExt.getBody(), StandardCharsets.UTF_8);
         OrderDomain orderDomain = JSON.parseObject(messageBody, OrderDomain.class);
         PromotionStockLogDomain promotionStockLogDomain = promotionStockLogService.getLogByOrderIdAndOperation(orderDomain.getOrderNumber(), OperationName.LOCK_STOCK.toString());
-        if (promotionStockLogDomain.getStatus() == OperationStatus.CONSUMED) {
+        if (promotionStockLogDomain.getStatus() != OperationStatus.INIT) {
             // CONSUMED 说明是重复消费
             return;
         }
         try {
+            // create an order
+            orderDomain.setCreateTime(LocalDateTime.now());
+            orderDomain.setOrderStatus(OrderStatus.CREATED);
+            orderService.createOrder(orderDomain);
             // write stock info back to DB
             promotionService.lockPromotionStock(orderDomain.getPromotionId());
             // 更新流水
             promotionStockLogDomain.setStatus(OperationStatus.CONSUMED);
+            // send a 'pay-check' message
+            mqSendRepo.sendDelayMsgToTopic(payCheckTopic, JSON.toJSONString(orderDomain));
+            log.info("OrderApp: sent pay-check message. OrderId: " + orderDomain.getOrderNumber());
         } catch (Exception e) {
             promotionStockLogDomain.setStatus(OperationStatus.ROLLBACK);
             log.error("CreateOrderConsumer: lock promotion stock error");
@@ -61,8 +70,5 @@ public class CreateOrderConsumer implements RocketMQListener<MessageExt> {
         } finally {
             promotionStockLogService.updatePromotionStockLog(promotionStockLogDomain);
         }
-        // send a 'pay-check' message
-        mqSendRepo.sendDelayMsgToTopic(payCheckTopic, JSON.toJSONString(orderDomain));
-        log.info("OrderApp: sent pay-check message. OrderId: " + orderDomain.getOrderNumber());
     }
 }

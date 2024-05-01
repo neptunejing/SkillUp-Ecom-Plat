@@ -49,15 +49,13 @@ public class PayCheckConsumer implements RocketMQListener<MessageExt> {
         OrderStatus currOrderStatus = currOrder.getOrderStatus();
         // 2. didn't pay within the delay time
         if (currOrderStatus.equals(OrderStatus.CREATED)) {
-            // 2.1 update order status
+            // update order status
             currOrder.setOrderStatus(OrderStatus.OVERTIME);
             orderService.updateOrder(currOrder);
-
-            // 2.2 revert cached stock
+            // revert cached stock
             StockDomain stockDomain = StockDomain.builder().promotionId(orderDomain.getPromotionId()).build();
             stockService.revertAvailableStock(stockDomain);
-
-            // 2.3 revert DB stock by MQ
+            // revert DB stock
             promotionService.revertPromotionStock(orderDomain.getPromotionId());
         } else if (currOrderStatus.equals(OrderStatus.PAID)) {
             // 3. paid successfully: stock should be deducted once the payment was done

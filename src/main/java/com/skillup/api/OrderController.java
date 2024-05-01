@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/order")
@@ -45,22 +47,25 @@ public class OrderController {
     }
 
     @PatchMapping("/pay")
-    public ResponseEntity<OrderOutDto> payBuyNowOrder(@RequestBody OrderStatusInDto orderStatusInDto) {
+    public ResponseEntity<OrderOutDto> payBuyNowOrder(@RequestBody OrderStatusInDto orderStatusInDto) throws ExecutionException, InterruptedException {
         OrderDomain orderDomain = orderApplication.payBuyNowOrder(orderStatusInDto.getOrderNumber(), orderStatusInDto.getExistStatus(), orderStatusInDto.getExpectStatus());
         if (Objects.isNull(orderDomain)) {
             return ResponseEntity.status(SkillUpCommon.BAD_REQUEST).body(null);
         }
-        OrderStatus orderStatus = orderDomain.getOrderStatus();
-        if (orderStatus.equals(OrderStatus.PAID)) {
-            return ResponseEntity.status(SkillUpCommon.SUCCESS).body(toOutDto(orderDomain));
+        // mock 获取异步支付结果
+        CompletableFuture<OrderDomain> future = CompletableFuture.supplyAsync(() -> this.asyncGetPaymentResult(orderDomain.getOrderNumber()));
+        OrderDomain orderDomainAfterPayment = future.get();
+        OrderStatus orderStatusAfterPayment = orderDomainAfterPayment.getOrderStatus();
+        if (orderStatusAfterPayment.equals(OrderStatus.PAID)) {
+            return ResponseEntity.status(SkillUpCommon.SUCCESS).body(toOutDto(orderDomainAfterPayment));
         }
-        if (orderStatus.equals(OrderStatus.CREATED)) {
-            return ResponseEntity.status(SkillUpCommon.INTERNAL_ERROR).body(toOutDto(orderDomain));
+        if (orderStatusAfterPayment.equals(OrderStatus.CREATED)) {
+            return ResponseEntity.status(SkillUpCommon.INTERNAL_ERROR).body(toOutDto(orderDomainAfterPayment));
         }
-        if (orderStatus.equals(OrderStatus.OVERTIME)) {
-            return ResponseEntity.status(SkillUpCommon.BAD_REQUEST).body(toOutDto(orderDomain));
+        if (orderStatusAfterPayment.equals(OrderStatus.OVERTIME)) {
+            return ResponseEntity.status(SkillUpCommon.BAD_REQUEST).body(toOutDto(orderDomainAfterPayment));
         } else {
-            return ResponseEntity.status(SkillUpCommon.INTERNAL_ERROR).body(toOutDto(orderDomain));
+            return ResponseEntity.status(SkillUpCommon.INTERNAL_ERROR).body(toOutDto(orderDomainAfterPayment));
         }
     }
 
@@ -86,5 +91,14 @@ public class OrderController {
                 .createTime(orderDomain.getCreateTime())
                 .payTime(orderDomain.getPayTime())
                 .build();
+    }
+
+    private OrderDomain asyncGetPaymentResult(Long orderNumber) {
+        try {
+            Thread.sleep(2000);
+            return orderService.getOrderById(orderNumber);
+        } catch (InterruptedException e) {
+            return null;
+        }
     }
 }

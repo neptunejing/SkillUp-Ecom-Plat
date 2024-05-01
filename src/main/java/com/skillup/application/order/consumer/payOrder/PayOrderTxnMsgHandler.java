@@ -22,23 +22,15 @@ import java.util.Objects;
 @Slf4j
 public class PayOrderTxnMsgHandler implements TransactionMessageHandler {
     @Autowired
-    OrderService orderService;
-
-    @Autowired
     PromotionStockLogService promotionStockLogService;
 
     @Override
     public RocketMQLocalTransactionState executeLocalTransaction(Object payload, Object arg) {
-        String messageBody = new String((byte[]) payload, StandardCharsets.UTF_8);
-        OrderDomain orderDomain = JSON.parseObject(messageBody, OrderDomain.class);
         try {
             boolean isPaid = thirdPartyPayment();
             if (!isPaid) {
                 throw new RuntimeException();
             }
-            orderDomain.setOrderStatus(OrderStatus.PAID);
-            orderDomain.setPayTime(LocalDateTime.now());
-            orderService.updateOrder(orderDomain);
         } catch (Exception e) {
             log.info("PayOrderTxnMsg Rollback");
             return RocketMQLocalTransactionState.ROLLBACK;
@@ -66,16 +58,5 @@ public class PayOrderTxnMsgHandler implements TransactionMessageHandler {
 
     private boolean thirdPartyPayment() {
         return true;
-    }
-
-    private PromotionStockLogDomain toPromotionStockLogDomain(OrderDomain orderDomain) {
-        return PromotionStockLogDomain.builder()
-                .promotionId(orderDomain.getPromotionId())
-                .orderNumber(orderDomain.getOrderNumber())
-                .userId(orderDomain.getUserId())
-                .operationName(OperationName.DEDUCT_STOCK)
-                .createTime(LocalDateTime.now())
-                .status(OperationStatus.INIT)
-                .build();
     }
 }

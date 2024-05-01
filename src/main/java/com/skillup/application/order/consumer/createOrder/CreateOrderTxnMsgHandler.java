@@ -28,9 +28,6 @@ public class CreateOrderTxnMsgHandler implements TransactionMessageHandler {
     MQSendRepo mqSendRepo;
 
     @Autowired
-    OrderService orderService;
-
-    @Autowired
     StockService stockService;
 
     @Autowired
@@ -48,10 +45,6 @@ public class CreateOrderTxnMsgHandler implements TransactionMessageHandler {
                 log.info("CreateOrderTxnMsg Rollback");
                 throw new RuntimeException();
             }
-            // create an order
-            orderDomain.setCreateTime(LocalDateTime.now());
-            orderDomain.setOrderStatus(OrderStatus.CREATED);
-            orderService.createOrder(orderDomain);
         } catch (Exception e) {
             stockService.revertAvailableStock(stockDomain);
             log.info("CreateOrderTxnMsg Rollback");
