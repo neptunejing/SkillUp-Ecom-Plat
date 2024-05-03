@@ -6,11 +6,11 @@ import com.skillup.domain.order.OrderDomain;
 import com.skillup.domain.order.OrderService;
 import com.skillup.domain.order.util.OrderStatus;
 import com.skillup.domain.promotion.PromotionDomain;
+import com.skillup.domain.promotion.util.PromotionBloomFilter;
 import com.skillup.domain.promotionStockLog.PromotionStockLogDomain;
 import com.skillup.domain.promotionStockLog.PromotionStockLogService;
 import com.skillup.domain.promotionStockLog.util.OperationName;
 import com.skillup.domain.promotionStockLog.util.OperationStatus;
-import com.skillup.domain.stock.StockDomain;
 import com.skillup.domain.stock.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +27,9 @@ public class OrderApplication {
 
     @Autowired
     PromotionApplication promotionApplication;
+
+    @Autowired
+    PromotionBloomFilter promotionBloomFilter;
 
     @Autowired
     StockService stockService;
@@ -74,6 +77,10 @@ public class OrderApplication {
             mqSendRepo.sendTxnMsg(payOrderTopic, JSON.toJSONString(orderDomain));
         }
         return orderDomain;
+    }
+
+    public boolean ifPromotionMightContain(String promotionId) {
+        return promotionBloomFilter.mightContain(promotionId);
     }
 
     private PromotionStockLogDomain toPromotionStockLogDomain(OrderDomain orderDomain, OperationName operationName) {
