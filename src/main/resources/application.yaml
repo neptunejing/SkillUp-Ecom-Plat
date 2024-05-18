@@ -4,7 +4,7 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/skillup
+    url: jdbc:mysql://mysql:3306/skillup
     username: root
     password: 123456
   flyway:
@@ -12,7 +12,7 @@ spring:
     enabled: true
   redis:
     database: 0
-    host: localhost
+    host: redis
     port: 6379
     # 连接超时时间
     timeout: 0
@@ -51,7 +51,7 @@ order:
 # rocketmq 配置信息
 rocketmq:
   # rocketmq 服务接入地址
-  name-server: localhost:9876
+  name-server: 192.168.31.96:9876
   # Producer 配置项
   producer:
     # 生产者组名

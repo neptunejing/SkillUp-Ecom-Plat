@@ -20,6 +20,7 @@ import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @RestController
+@CrossOrigin
 @RequestMapping("/order")
 public class OrderController {
     @Autowired

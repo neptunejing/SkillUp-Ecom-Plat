@@ -122,7 +122,7 @@
                         <driver>com.mysql.jdbc.Driver</driver>
                         <url>jdbc:mysql://localhost:3306/skillup</url>
                         <user>root</user>
-                        <password>672546</password>
+                        <password>123456</password>
                     </jdbc>
                     <generator>
                         <name>org.jooq.codegen.JavaGenerator</name>
@@ -144,6 +144,10 @@
                         </target>
                     </generator>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
             <!-- MapStruct -->
             <plugin>
