@@ -18,9 +18,6 @@ public class RocketMQRepo implements MQSendRepo {
     @Autowired
     RocketMQTemplate rocketMQTemplate;
 
-    @Value("${order.delay-time}")
-    Integer delaySeconds;
-
     @Override
     public void sendMsgToTopic(String topic, String originMsg) {
         // 1. create msg
@@ -35,7 +32,7 @@ public class RocketMQRepo implements MQSendRepo {
     }
 
     @Override
-    public void sendDelayMsgToTopic(String topic, String originMsg) {
+    public void sendDelayMsgToTopic(String topic, String originMsg, int delaySeconds) {
         // 1. create msg
         Message message = new Message(topic, originMsg.getBytes(StandardCharsets.UTF_8));
         message.setDelayTimeLevel(secondsToRocketMQLevel(delaySeconds));

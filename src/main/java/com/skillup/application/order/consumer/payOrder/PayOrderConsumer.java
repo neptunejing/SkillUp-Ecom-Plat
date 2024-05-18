@@ -3,7 +3,6 @@ package com.skillup.application.order.consumer.payOrder;
 import com.alibaba.fastjson.JSON;
 import com.skillup.domain.order.OrderDomain;
 import com.skillup.domain.order.OrderService;
-import com.skillup.domain.order.util.OrderStatus;
 import com.skillup.domain.promotion.PromotionService;
 import com.skillup.domain.promotionStockLog.PromotionStockLogDomain;
 import com.skillup.domain.promotionStockLog.PromotionStockLogService;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 
 @Component
 @Slf4j
@@ -43,11 +41,6 @@ public class PayOrderConsumer implements RocketMQListener<MessageExt> {
             return;
         }
         try {
-            // update order status
-            orderDomain.setOrderStatus(OrderStatus.PAID);
-            orderDomain.setPayTime(LocalDateTime.now());
-            orderService.updateOrder(orderDomain);
-            // write stock info back to DB
             promotionService.deductPromotionStock(orderDomain.getPromotionId());
             promotionStockLogDomain.setStatus(OperationStatus.CONSUMED);
         } catch (Exception e) {

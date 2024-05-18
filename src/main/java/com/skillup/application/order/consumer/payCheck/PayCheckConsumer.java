@@ -13,6 +13,7 @@ import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,19 +36,24 @@ public class PayCheckConsumer implements RocketMQListener<MessageExt> {
     @Autowired
     PromotionService promotionService;
 
+    @Value("${order.topic.pay-check}")
+    String payCheckTopic;
+
+    @Value("${order.delay-time}")
+    Integer delaySeconds;
+
     @Override
     @Transactional
     public void onMessage(MessageExt messageExt) {
         String messageBody = new String(messageExt.getBody(), StandardCharsets.UTF_8);
         OrderDomain orderDomain = JSON.parseObject(messageBody, OrderDomain.class);
         log.info("OrderApp: received pay-check message. OrderId: " + orderDomain.getOrderNumber());
-        // 1. retrieve the newest order from DB
         OrderDomain currOrder = orderService.getOrderById(orderDomain.getOrderNumber());
         if (Objects.isNull(currOrder)) {
             throw new RuntimeException("Order doesn't exist.");
         }
         OrderStatus currOrderStatus = currOrder.getOrderStatus();
-        // 2. didn't pay within the delay time
+        // didn't pay within the delay time
         if (currOrderStatus.equals(OrderStatus.CREATED)) {
             // update order status
             currOrder.setOrderStatus(OrderStatus.OVERTIME);
@@ -58,10 +64,14 @@ public class PayCheckConsumer implements RocketMQListener<MessageExt> {
             // revert DB stock
             promotionService.revertPromotionStock(orderDomain.getPromotionId());
         } else if (currOrderStatus.equals(OrderStatus.PAID)) {
-            // 3. paid successfully: stock should be deducted once the payment was done
+            // paid successfully: stock should be deducted once the payment was done
             log.info("Order (Id: " + orderDomain.getOrderNumber() + ") has been paid successfully");
-        } else if (currOrderStatus.equals(OrderStatus.OVERTIME)) {
-            // 4. the order is already overtime or cancelled
+        } else if (currOrderStatus.equals(OrderStatus.PAYING)) {
+            // 如果时延检查遇到 paying 状态，以 delaySeconds / 10 为延迟再次发送时延消息
+            // 获取异步支付结果的 get() 设置为 3s 后返回并认定失败，delaySeconds / 10 后订单要么支付成功要么失败
+            mqSendRepo.sendDelayMsgToTopic(payCheckTopic, JSON.toJSONString(orderDomain), delaySeconds / 10);
+        } else {
+            // the order is already overtime or cancelled
             log.info("Order (Id: " + orderDomain.getOrderNumber() + ") is already overtime/cancelled");
         }
     }

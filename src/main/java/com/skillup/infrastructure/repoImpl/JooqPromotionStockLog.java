@@ -33,7 +33,7 @@ public class JooqPromotionStockLog implements PromotionStockLogRepo {
     @Override
     public PromotionStockLogDomain getLogByOrderIdAndOperation(Long orderId, String operationName) {
         return dslContext.selectFrom(PROMOTION_LOG_T).where(PROMOTION_LOG_T.ORDER_NUMBER.eq(orderId).and(PROMOTION_LOG_T.OPERATION_NAME.eq(operationName)))
-                .fetchOptional(this::toDomain).orElse(null);
+                .forUpdate().fetchOptional(this::toDomain).orElse(null);
     }
 
     private PromotionLogRecord toRecord(PromotionStockLogDomain promotionStockLogDomain) {

@@ -15,6 +15,7 @@ import com.skillup.domain.stock.StockService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.core.RocketMQLocalTransactionState;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -33,21 +34,36 @@ public class CreateOrderTxnMsgHandler implements TransactionMessageHandler {
     @Autowired
     PromotionStockLogService promotionStockLogService;
 
+    @Autowired
+    OrderService orderService;
+
+    @Value("${order.topic.pay-check}")
+    String payCheckTopic;
+
+    @Value("${order.delay-time}")
+    int delaySeconds;
+
     @Override
     public RocketMQLocalTransactionState executeLocalTransaction(Object payload, Object arg) {
         String messageBody = new String((byte[]) payload, StandardCharsets.UTF_8);
         OrderDomain orderDomain = JSON.parseObject(messageBody, OrderDomain.class);
         // lock cached promotion stock
         StockDomain stockDomain = StockDomain.builder().promotionId(orderDomain.getPromotionId()).build();
+        boolean isLocked = stockService.lockAvailableStock(stockDomain);
+        if (!isLocked) {
+            log.info("[Out of Stock] CreateOrderTxnMsg Rollback");
+            return RocketMQLocalTransactionState.ROLLBACK;
+        }
         try {
-            boolean isLocked = stockService.lockAvailableStock(stockDomain);
-            if (!isLocked) {
-                log.info("CreateOrderTxnMsg Rollback");
-                throw new RuntimeException();
-            }
+            orderDomain.setCreateTime(LocalDateTime.now());
+            orderDomain.setOrderStatus(OrderStatus.CREATED);
+            orderService.createOrder(orderDomain);
+            // send a 'pay-check' message
+            mqSendRepo.sendDelayMsgToTopic(payCheckTopic, JSON.toJSONString(orderDomain), delaySeconds);
+            log.info("OrderApp: sent pay-check message. OrderId: " + orderDomain.getOrderNumber());
         } catch (Exception e) {
             stockService.revertAvailableStock(stockDomain);
-            log.info("CreateOrderTxnMsg Rollback");
+            log.info("[Create Order Error] CreateOrderTxnMsg Rollback");
             return RocketMQLocalTransactionState.ROLLBACK;
         }
         return RocketMQLocalTransactionState.COMMIT;
@@ -57,17 +73,12 @@ public class CreateOrderTxnMsgHandler implements TransactionMessageHandler {
     public RocketMQLocalTransactionState checkLocalTransaction(Object payload) {
         String messageBody = new String((byte[]) payload, StandardCharsets.UTF_8);
         OrderDomain orderDomain = JSON.parseObject(messageBody, OrderDomain.class);
-        // 检查流水表
-        PromotionStockLogDomain promotionStockLogDomain = promotionStockLogService.getLogByOrderIdAndOperation(orderDomain.getOrderNumber(), OperationName.LOCK_STOCK.toString());
-        if (Objects.isNull(promotionStockLogDomain)) {
-            return RocketMQLocalTransactionState.UNKNOWN;
-        }
-        if (promotionStockLogDomain.getStatus() == OperationStatus.CONSUMED) {
+        OrderDomain existedOrderDomain = orderService.getOrderById(orderDomain.getOrderNumber());
+        if (!Objects.isNull(existedOrderDomain)) {
+            // 订单存在，直接 COMMIT
             return RocketMQLocalTransactionState.COMMIT;
         }
-        if (promotionStockLogDomain.getStatus() == OperationStatus.INIT) {
-            return RocketMQLocalTransactionState.UNKNOWN;
-        }
+        // 否则 ROLLBACK
         return RocketMQLocalTransactionState.ROLLBACK;
     }
 }

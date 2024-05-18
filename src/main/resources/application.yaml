@@ -6,7 +6,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/skillup
     username: root
-    password: 672546
+    password: 123456
   flyway:
     baseline-on-migrate: true
     enabled: true

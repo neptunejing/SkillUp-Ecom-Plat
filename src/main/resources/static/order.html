@@ -174,7 +174,7 @@
 						var obj = {};
 						obj["existStatus"] = 1;
 						obj["orderNumber"] = document.getElementById('orderNumber').innerHTML;
-						obj["expectStatus"] = 2;
+						obj["expectStatus"] = 3;
 						console.log(obj);
 						return obj;
 					}
@@ -199,12 +199,12 @@
 									if (orderStatus == 0) {$('#orderStatus').html("Sold Out");}
 									else if (orderStatus == 1) {$('#orderStatus').html("Created, waiting for paying");}
 									else if (orderStatus == 2) {
-										$('#orderStatus').html("Payed, waiting for delivering");
-										alert("Pay successfully!")
+										$('#orderStatus').html("Paying, please wait ");
+										alert("Paying, please wait!")
 									}
 									else if (orderStatus == 3) {
-										$('#orderStatus').html("Order is closed，cause of paying overtime");
-										alert("Order time out, Pay failed");
+										$('#orderStatus').html("Payed, waiting for delivering");
+										alert("Pay successfully!")
 									}
 							},
 							error: function (data) {
