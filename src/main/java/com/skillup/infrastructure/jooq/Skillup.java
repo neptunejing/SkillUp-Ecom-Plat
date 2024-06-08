@@ -7,6 +7,7 @@ package com.skillup.infrastructure.jooq;
 import com.skillup.infrastructure.jooq.tables.Commodity;
 import com.skillup.infrastructure.jooq.tables.Order;
 import com.skillup.infrastructure.jooq.tables.Promotion;
+import com.skillup.infrastructure.jooq.tables.PromotionLog;
 import com.skillup.infrastructure.jooq.tables.User;
 
 import java.util.Arrays;
@@ -46,6 +47,11 @@ public class Skillup extends SchemaImpl {
     public final Promotion PROMOTION = Promotion.PROMOTION;
 
     /**
+     * The table <code>skillup.promotion_log</code>.
+     */
+    public final PromotionLog PROMOTION_LOG = PromotionLog.PROMOTION_LOG;
+
+    /**
      * The table <code>skillup.user</code>.
      */
     public final User USER = User.USER;
@@ -69,6 +75,7 @@ public class Skillup extends SchemaImpl {
             Commodity.COMMODITY,
             Order.ORDER,
             Promotion.PROMOTION,
+            PromotionLog.PROMOTION_LOG,
             User.USER);
     }
 }
