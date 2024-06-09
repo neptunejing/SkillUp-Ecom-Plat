@@ -2,6 +2,18 @@ server:
   port: 8090
 
 spring:
+  application:
+    name: template-service # consul 注册中心相关配置
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery: # 是否注册（默认 true）
+        register: true
+        # 服务名称
+        service-name: ${spring.application.name}
+        # 展示实例 ip（默认 false）
+        prefer-ip-address: true
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/skillup
