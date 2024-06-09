@@ -9,7 +9,6 @@ import com.skillup.application.order.OrderApplication;
 import com.skillup.domain.order.OrderDomain;
 import com.skillup.domain.order.OrderService;
 import com.skillup.domain.order.util.OrderStatus;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +17,6 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-@Slf4j
 @RestController
 @CrossOrigin
 @RequestMapping("/order")
@@ -36,11 +34,6 @@ public class OrderController {
     // BuyNowOrder 即直接下单，不经过放入 cart 的步骤
     @PostMapping()
     public ResponseEntity<OrderOutDto> createBuyNowOrder(@RequestBody OrderInDto orderInDto) {
-        if (!orderApplication.ifPromotionMightContain(orderInDto.getPromotionId())) {
-            // 缓存中不存在该秒杀商品 id
-            log.info("-----[Promotion BloomFilter]: PromotionId doesn't exist -----");
-            return ResponseEntity.status(SkillUpCommon.BAD_REQUEST).body(null);
-        }
         OrderDomain orderDomain = orderApplication.createBuyNowOrder(toDomain(orderInDto));
         return ResponseEntity.status(SkillUpCommon.SUCCESS).body(toOutDto(orderDomain));
     }
