@@ -1,7 +1,6 @@
 package com.skillup.application.promotion;
 
 import com.skillup.application.mapper.PromotionCacheMapper;
-import com.skillup.domain.promotion.util.PromotionBloomFilter;
 import com.skillup.domain.promotion.PromotionDomain;
 import com.skillup.domain.promotion.PromotionService;
 import com.skillup.domain.promotionCache.PromotionCacheService;
@@ -24,10 +23,8 @@ public class PromotionPreheatApplication implements ApplicationRunner {
     @Autowired
     PromotionCacheService promotionCacheService;
 
-    @Autowired
-    PromotionBloomFilter promotionBloomFilter;
-
     @Override
+
     public void run(ApplicationArguments args) throws Exception {
         log.info("----- Promotion Preheat: set available stock to cache -----");
         // get all active promotions
@@ -35,7 +32,6 @@ public class PromotionPreheatApplication implements ApplicationRunner {
         promotionDomainList.forEach(promotionDomain -> {
             // set available stocks to cache
             stockService.setAvailableStock(promotionDomain.getPromotionId(), promotionDomain.getAvailableStock());
-            promotionBloomFilter.addValue(promotionDomain.getPromotionId());
             // set promotions to cache
             promotionCacheService.setPromotionCache(PromotionCacheMapper.INSTANCE.toCache(promotionDomain));
         });
