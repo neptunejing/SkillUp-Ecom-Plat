@@ -3,15 +3,11 @@ package com.skillup.application.order.consumer.createOrder;
 import com.alibaba.fastjson.JSON;
 import com.skillup.application.order.MQSendRepo;
 import com.skillup.application.order.consumer.TransactionMessageHandler;
+import com.skillup.application.promotion.StockServiceApi;
 import com.skillup.domain.order.OrderDomain;
 import com.skillup.domain.order.OrderService;
 import com.skillup.domain.order.util.OrderStatus;
-import com.skillup.domain.promotionStockLog.PromotionStockLogDomain;
-import com.skillup.domain.promotionStockLog.PromotionStockLogService;
-import com.skillup.domain.promotionStockLog.util.OperationName;
-import com.skillup.domain.promotionStockLog.util.OperationStatus;
 import com.skillup.domain.stock.StockDomain;
-import com.skillup.domain.stock.StockService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.core.RocketMQLocalTransactionState;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +25,7 @@ public class CreateOrderTxnMsgHandler implements TransactionMessageHandler {
     MQSendRepo mqSendRepo;
 
     @Autowired
-    StockService stockService;
-
-    @Autowired
-    PromotionStockLogService promotionStockLogService;
+    StockServiceApi stockServiceApi;
 
     @Autowired
     OrderService orderService;
@@ -49,7 +42,7 @@ public class CreateOrderTxnMsgHandler implements TransactionMessageHandler {
         OrderDomain orderDomain = JSON.parseObject(messageBody, OrderDomain.class);
         // lock cached promotion stock
         StockDomain stockDomain = StockDomain.builder().promotionId(orderDomain.getPromotionId()).build();
-        boolean isLocked = stockService.lockAvailableStock(stockDomain);
+        boolean isLocked = stockServiceApi.lockAvailableStock(stockDomain);
         if (!isLocked) {
             log.info("[Out of Stock] CreateOrderTxnMsg Rollback");
             return RocketMQLocalTransactionState.ROLLBACK;
@@ -62,7 +55,7 @@ public class CreateOrderTxnMsgHandler implements TransactionMessageHandler {
             mqSendRepo.sendDelayMsgToTopic(payCheckTopic, JSON.toJSONString(orderDomain), delaySeconds);
             log.info("OrderApp: sent pay-check message. OrderId: " + orderDomain.getOrderNumber());
         } catch (Exception e) {
-            stockService.revertAvailableStock(stockDomain);
+            stockServiceApi.revertAvailableStock(stockDomain);
             log.info("[Create Order Error] CreateOrderTxnMsg Rollback");
             return RocketMQLocalTransactionState.ROLLBACK;
         }

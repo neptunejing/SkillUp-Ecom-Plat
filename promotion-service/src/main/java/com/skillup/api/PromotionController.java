@@ -62,8 +62,7 @@ public class PromotionController {
         if (Objects.isNull(promotionDomain)) {
             return ResponseEntity.status(SkillUpCommon.BAD_REQUEST).body(false);
         }
-        StockDomain stockDomain = StockDomain.builder().promotionId(promotionId).build();
-        boolean isLocked = stockService.lockAvailableStock(stockDomain);
+        boolean isLocked = promotionService.lockPromotionStock(promotionId);
         if (isLocked) {
             return ResponseEntity.status(SkillUpCommon.SUCCESS).body(true);
         }
@@ -90,8 +89,7 @@ public class PromotionController {
         if (Objects.isNull(promotionDomain)) {
             return ResponseEntity.status(SkillUpCommon.BAD_REQUEST).body(false);
         }
-        StockDomain stockDomain = StockDomain.builder().promotionId(promotionId).build();
-        boolean isReverted = stockService.revertAvailableStock(stockDomain);
+        boolean isReverted = promotionService.revertPromotionStock(promotionId);
         if (isReverted) {
             return ResponseEntity.status(SkillUpCommon.SUCCESS).body(true);
         }

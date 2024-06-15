@@ -29,6 +29,7 @@
         <lombok.version>1.18.30</lombok.version>
         <map-struct.version>1.6.0.Beta1</map-struct.version>
         <fastjson.version>2.0.31</fastjson.version>
+        <okhttp.version>11.10</okhttp.version>
     </properties>
 
     <dependencyManagement>
@@ -98,6 +99,12 @@
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-openfeign</artifactId>
                 <version>${spring-cloud.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.openfeign</groupId>
+                <artifactId>feign-okhttp</artifactId>
+                <version>${okhttp.version}</version>
             </dependency>
 
             <!-- spring cloud gateway -->

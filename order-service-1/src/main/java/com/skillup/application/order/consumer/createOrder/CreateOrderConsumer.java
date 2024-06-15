@@ -2,10 +2,10 @@ package com.skillup.application.order.consumer.createOrder;
 
 import com.alibaba.fastjson.JSON;
 import com.skillup.application.order.MQSendRepo;
+import com.skillup.application.promotion.PromotionServiceApi;
+import com.skillup.application.promotion.PromotionStockLogServiceApi;
 import com.skillup.domain.order.OrderDomain;
-import com.skillup.domain.promotion.PromotionService;
 import com.skillup.domain.promotionStockLog.PromotionStockLogDomain;
-import com.skillup.domain.promotionStockLog.PromotionStockLogService;
 import com.skillup.domain.promotionStockLog.util.OperationName;
 import com.skillup.domain.promotionStockLog.util.OperationStatus;
 import lombok.extern.slf4j.Slf4j;
@@ -26,24 +26,24 @@ public class CreateOrderConsumer implements RocketMQListener<MessageExt> {
     MQSendRepo mqSendRepo;
 
     @Autowired
-    PromotionService promotionService;
+    PromotionServiceApi promotionServiceApi;
 
     @Autowired
-    PromotionStockLogService promotionStockLogService;
+    PromotionStockLogServiceApi promotionStockLogServiceApi;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void onMessage(MessageExt messageExt) {
         String messageBody = new String(messageExt.getBody(), StandardCharsets.UTF_8);
         OrderDomain orderDomain = JSON.parseObject(messageBody, OrderDomain.class);
-        PromotionStockLogDomain promotionStockLogDomain = promotionStockLogService.getLogByOrderIdAndOperation(orderDomain.getOrderNumber(), OperationName.LOCK_STOCK.toString());
+        PromotionStockLogDomain promotionStockLogDomain = promotionStockLogServiceApi.getLogByOrderIdAndOperation(orderDomain.getOrderNumber(), OperationName.LOCK_STOCK.toString());
         if (promotionStockLogDomain.getStatus() != OperationStatus.INIT) {
             // CONSUMED 说明是重复消费
             return;
         }
         try {
             // write stock info back to DB
-            promotionService.lockPromotionStock(orderDomain.getPromotionId());
+            promotionServiceApi.lockPromotionStock(orderDomain.getPromotionId());
             // 更新流水
             promotionStockLogDomain.setStatus(OperationStatus.CONSUMED);
         } catch (Exception e) {
@@ -51,7 +51,7 @@ public class CreateOrderConsumer implements RocketMQListener<MessageExt> {
             log.error("CreateOrderConsumer: lock promotion stock error");
             throw e;
         } finally {
-            promotionStockLogService.updatePromotionStockLog(promotionStockLogDomain);
+            promotionStockLogServiceApi.updatePromotionStockLog(promotionStockLogDomain);
         }
     }
 }

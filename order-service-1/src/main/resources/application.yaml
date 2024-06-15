@@ -24,6 +24,10 @@ spring:
     enabled: true
 
 # Custom Config
+feign:
+  okhttp:
+    enabled: true
+
 promotion:
   stock-strategy: optimistic # [overall, sync, optimistic]
   topic:

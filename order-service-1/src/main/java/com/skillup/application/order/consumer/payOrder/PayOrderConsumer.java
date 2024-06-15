@@ -1,11 +1,11 @@
 package com.skillup.application.order.consumer.payOrder;
 
 import com.alibaba.fastjson.JSON;
+import com.skillup.application.promotion.PromotionServiceApi;
+import com.skillup.application.promotion.PromotionStockLogServiceApi;
 import com.skillup.domain.order.OrderDomain;
 import com.skillup.domain.order.OrderService;
-import com.skillup.domain.promotion.PromotionService;
 import com.skillup.domain.promotionStockLog.PromotionStockLogDomain;
-import com.skillup.domain.promotionStockLog.PromotionStockLogService;
 import com.skillup.domain.promotionStockLog.util.OperationName;
 import com.skillup.domain.promotionStockLog.util.OperationStatus;
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +23,10 @@ import java.nio.charset.StandardCharsets;
 @RocketMQMessageListener(topic = "${order.topic.pay-order}", consumerGroup = "${order.topic.pay-order-group}")
 public class PayOrderConsumer implements RocketMQListener<MessageExt> {
     @Autowired
-    PromotionStockLogService promotionStockLogService;
+    PromotionStockLogServiceApi promotionStockLogServiceApi;
 
     @Autowired
-    PromotionService promotionService;
+    PromotionServiceApi promotionServiceApi;
 
     @Autowired
     OrderService orderService;
@@ -36,19 +36,19 @@ public class PayOrderConsumer implements RocketMQListener<MessageExt> {
     public void onMessage(MessageExt messageExt) {
         String messageBody = new String(messageExt.getBody(), StandardCharsets.UTF_8);
         OrderDomain orderDomain = JSON.parseObject(messageBody, OrderDomain.class);
-        PromotionStockLogDomain promotionStockLogDomain = promotionStockLogService.getLogByOrderIdAndOperation(orderDomain.getOrderNumber(), OperationName.DEDUCT_STOCK.toString());
+        PromotionStockLogDomain promotionStockLogDomain = promotionStockLogServiceApi.getLogByOrderIdAndOperation(orderDomain.getOrderNumber(), OperationName.DEDUCT_STOCK.toString());
         if (promotionStockLogDomain.getStatus() != OperationStatus.INIT) {
             return;
         }
         try {
-            promotionService.deductPromotionStock(orderDomain.getPromotionId());
+            promotionServiceApi.deductPromotionStock(orderDomain.getPromotionId());
             promotionStockLogDomain.setStatus(OperationStatus.CONSUMED);
         } catch (Exception e) {
             promotionStockLogDomain.setStatus(OperationStatus.ROLLBACK);
             log.error("PayOrderConsumer: deduct promotion stock error");
             throw e;
         } finally {
-            promotionStockLogService.updatePromotionStockLog(promotionStockLogDomain);
+            promotionStockLogServiceApi.updatePromotionStockLog(promotionStockLogDomain);
         }
     }
 }

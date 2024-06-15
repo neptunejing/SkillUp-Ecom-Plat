@@ -5,7 +5,6 @@ import com.skillup.application.order.consumer.TransactionMessageHandler;
 import com.skillup.domain.order.OrderDomain;
 import com.skillup.domain.order.OrderService;
 import com.skillup.domain.order.util.OrderStatus;
-import com.skillup.domain.promotionStockLog.PromotionStockLogService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.core.RocketMQLocalTransactionState;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +19,6 @@ import java.util.concurrent.TimeUnit;
 @Component("PayOrderTxnMsgHandler")
 @Slf4j
 public class PayOrderTxnMsgHandler implements TransactionMessageHandler {
-    @Autowired
-    PromotionStockLogService promotionStockLogService;
 
     @Autowired
     OrderService orderService;
