@@ -1,0 +1,43 @@
+server:
+  port: 8003
+
+spring:
+  application:
+    name: promotion-service # consul 注册中心相关配置
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery: # 是否注册（默认 true）
+        register: true
+        # 服务名称
+        service-name: ${spring.application.name}
+        # 展示实例 ip（默认 false）
+        prefer-ip-address: true
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/promotion-service
+    username: root
+    password: 123456
+  flyway:
+    baseline-on-migrate: true
+    enabled: true
+  redis:
+    database: 0
+    host: localhost
+    port: 6379
+    # 连接超时时间
+    timeout: 0
+    lettuce:
+      pool:
+        max-active: 200 # 连接池最大连接数（负值表示无限制）
+        max-wait: -1 # 连接池最大阻塞等待时间
+        max-idle: 8 # 连接池最大空闲连接
+        min-idle: 0 # 连接池最小空闲连接
+  # spring-session 使用
+  session:
+    store-type: none
+
+# Custom Config
+promotion:
+  stock-strategy: optimistic # [overall, sync, optimistic]
