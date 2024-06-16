@@ -18,7 +18,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 @RestController
-@CrossOrigin
 @RequestMapping("/order")
 public class OrderController {
     @Autowired

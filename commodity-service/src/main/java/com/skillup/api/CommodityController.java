@@ -14,7 +14,6 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/commodity")
-@CrossOrigin
 public class CommodityController {
     @Autowired
     CommodityService commodityService;
