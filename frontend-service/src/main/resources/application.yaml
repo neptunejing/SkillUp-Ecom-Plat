@@ -1,0 +1,16 @@
+server:
+  port: 8010
+
+spring:
+  application:
+    name: frontend-service # consul 注册中心相关配置
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery: # 是否注册（默认 true）
+        register: true
+        # 服务名称
+        service-name: ${spring.application.name}
+        # 展示实例 ip（默认 false）
+        prefer-ip-address: true

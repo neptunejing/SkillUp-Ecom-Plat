@@ -2,10 +2,12 @@ package com.skillup;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @SpringBootApplication
-public class SkillUpApplication {
+@EnableDiscoveryClient
+public class FrontendApp {
     public static void main(String[] args) {
-        SpringApplication.run(SkillUpApplication.class, args);
+        SpringApplication.run(FrontendApp.class, args);
     }
 }
