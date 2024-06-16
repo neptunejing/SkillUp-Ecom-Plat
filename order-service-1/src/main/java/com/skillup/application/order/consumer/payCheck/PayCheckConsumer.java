@@ -7,6 +7,7 @@ import com.skillup.application.promotion.StockServiceApi;
 import com.skillup.domain.order.OrderDomain;
 import com.skillup.domain.order.OrderService;
 import com.skillup.domain.order.util.OrderStatus;
+import com.skillup.domain.promotionStockLog.util.OperationName;
 import com.skillup.domain.stock.StockDomain;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.common.message.MessageExt;
@@ -59,7 +60,11 @@ public class PayCheckConsumer implements RocketMQListener<MessageExt> {
             currOrder.setOrderStatus(OrderStatus.OVERTIME);
             orderService.updateOrder(currOrder);
             // revert cached stock
-            StockDomain stockDomain = StockDomain.builder().promotionId(orderDomain.getPromotionId()).build();
+            StockDomain stockDomain = StockDomain.builder()
+                    .promotionId(orderDomain.getPromotionId())
+                    .orderId(orderDomain.getOrderNumber())
+                    .operationName(OperationName.REVERT_STOCK)
+                    .build();
             stockServiceApi.revertAvailableStock(stockDomain);
             // revert DB stock
             promotionServiceApi.revertPromotionStock(orderDomain.getPromotionId());

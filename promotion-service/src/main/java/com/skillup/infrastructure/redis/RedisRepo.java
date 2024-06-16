@@ -39,7 +39,12 @@ public class RedisRepo implements StockRepository, PromotionCacheRepository {
     @Override
     public boolean lockAvailableStock(StockDomain stockDomain) {
         try {
-            Long stock = redisTemplate.execute(redisLockScript, Arrays.asList(StockDomain.createStockKey(stockDomain.getPromotionId())));
+            Long stock = redisTemplate.execute(redisLockScript,
+                    Arrays.asList(
+                            StockDomain.createStockKey(stockDomain.getPromotionId()),
+                            stockDomain.getOrderId().toString(),
+                            stockDomain.getOperationName().toString()
+                    ));
             if (stock >= 0) {
                 return true;
             } else {
@@ -54,7 +59,12 @@ public class RedisRepo implements StockRepository, PromotionCacheRepository {
     @Override
     public boolean revertAvailableStock(StockDomain stockDomain) {
         try {
-            Long stock = redisTemplate.execute(redisRevertScript, Arrays.asList(StockDomain.createStockKey(stockDomain.getPromotionId())));
+            Long stock = redisTemplate.execute(redisRevertScript,
+                    Arrays.asList(
+                            StockDomain.createStockKey(stockDomain.getPromotionId()),
+                            stockDomain.getOrderId().toString(),
+                            stockDomain.getOperationName().toString()
+                    ));
             if (stock > 0) {
                 return true;
             } else {

@@ -1,5 +1,6 @@
 package com.skillup.domain.stock;
 
+import com.skillup.domain.promotionStockLog.util.OperationName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +12,12 @@ import lombok.NoArgsConstructor;
 @Builder
 public class StockDomain {
     private String promotionId;
+
     private String availableStock;
+
+    private Long orderId;
+
+    private OperationName operationName;
 
     public static final String PROMOTION_PREFIX = "PROMOTION_";
 

@@ -7,6 +7,7 @@ import com.skillup.application.promotion.StockServiceApi;
 import com.skillup.domain.order.OrderDomain;
 import com.skillup.domain.order.OrderService;
 import com.skillup.domain.order.util.OrderStatus;
+import com.skillup.domain.promotionStockLog.util.OperationName;
 import com.skillup.domain.stock.StockDomain;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.core.RocketMQLocalTransactionState;
@@ -41,7 +42,11 @@ public class CreateOrderTxnMsgHandler implements TransactionMessageHandler {
         String messageBody = new String((byte[]) payload, StandardCharsets.UTF_8);
         OrderDomain orderDomain = JSON.parseObject(messageBody, OrderDomain.class);
         // lock cached promotion stock
-        StockDomain stockDomain = StockDomain.builder().promotionId(orderDomain.getPromotionId()).build();
+        StockDomain stockDomain = StockDomain.builder()
+                .promotionId(orderDomain.getPromotionId())
+                .orderId(orderDomain.getOrderNumber())
+                .operationName(OperationName.LOCK_STOCK)
+                .build();
         boolean isLocked = stockServiceApi.lockAvailableStock(stockDomain);
         if (!isLocked) {
             log.info("[Out of Stock] CreateOrderTxnMsg Rollback");
@@ -55,6 +60,7 @@ public class CreateOrderTxnMsgHandler implements TransactionMessageHandler {
             mqSendRepo.sendDelayMsgToTopic(payCheckTopic, JSON.toJSONString(orderDomain), delaySeconds);
             log.info("OrderApp: sent pay-check message. OrderId: " + orderDomain.getOrderNumber());
         } catch (Exception e) {
+            stockDomain.setOperationName(OperationName.REVERT_STOCK);
             stockServiceApi.revertAvailableStock(stockDomain);
             log.info("[Create Order Error] CreateOrderTxnMsg Rollback");
             return RocketMQLocalTransactionState.ROLLBACK;
