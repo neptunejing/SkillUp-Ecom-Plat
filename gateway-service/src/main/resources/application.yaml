@@ -60,13 +60,13 @@ spring:
           uri: lb://order-service-1
           predicates:
             - Path=/order/**
-#            - Header=mark, 1
+            - Header=mark, 1
           filters:
             - StripPrefix=0
-#        - id: order-route-2
-#          uri: lb://order-service-2
-#          predicates:
-#            - Path=/order/**
-#            - Header=mark, 2
-#          filters:
-#            - StripPrefix=0
+        - id: order-route-2
+          uri: lb://order-service-2
+          predicates:
+            - Path=/order/**
+            - Header=mark, 2
+          filters:
+            - StripPrefix=0
