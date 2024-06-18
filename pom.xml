@@ -14,6 +14,7 @@
         <module>commodity-service</module>
         <module>promotion-service</module>
         <module>order-service-1</module>
+        <module>order-service-2</module>
         <module>frontend-service</module>
         <module>gateway-service</module>
     </modules>

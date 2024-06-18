@@ -1,9 +1,9 @@
 server:
-  port: 8004
+  port: 8005
 
 spring:
   application:
-    name: order-service-1 # consul 注册中心相关配置
+    name: order-service-2 # consul 注册中心相关配置
   cloud:
     consul:
       host: localhost
@@ -16,7 +16,7 @@ spring:
         prefer-ip-address: true
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/order-service-1
+    url: jdbc:mysql://localhost:3306/order-service-2
     username: root
     password: 123456
   flyway:
@@ -32,15 +32,15 @@ promotion:
   stock-strategy: optimistic # [overall, sync, optimistic]
 
 order:
-  dataCenter: 1
+  dataCenter: 2
   machineNumber: 1
   topic:
-    create-order: create-order-1
-    create-order-group: CO-G-1
-    pay-order: pay-order-1
-    pay-order-group: PO-G-1
-    pay-check: pay-check-1
-    pay-check-group: PC-G-1
+    create-order: create-order-2
+    create-order-group: CO-G-2
+    pay-order: pay-order-2
+    pay-order-group: PO-G-2
+    pay-check: pay-check-2
+    pay-check-group: PC-G-2
   delay-time: 60
 
 # rocketmq 配置信息
