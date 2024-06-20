@@ -48,7 +48,7 @@ public class PayCheckConsumer implements RocketMQListener<MessageExt> {
     public void onMessage(MessageExt messageExt) {
         String messageBody = new String(messageExt.getBody(), StandardCharsets.UTF_8);
         OrderDomain orderDomain = JSON.parseObject(messageBody, OrderDomain.class);
-        log.info("OrderApp: received pay-check message. OrderId: " + orderDomain.getOrderNumber());
+        log.info("OrderApp2.1: received pay-check message. OrderId: " + orderDomain.getOrderNumber());
         OrderDomain currOrder = orderService.getOrderById(orderDomain.getOrderNumber());
         if (Objects.isNull(currOrder)) {
             throw new RuntimeException("Order doesn't exist.");

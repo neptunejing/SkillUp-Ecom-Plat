@@ -8,6 +8,7 @@ import com.skillup.domain.order.util.OrderStatus;
 import com.skillup.domain.promotionStockLog.PromotionStockLogDomain;
 import com.skillup.domain.promotionStockLog.util.OperationName;
 import com.skillup.domain.promotionStockLog.util.OperationStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Service
+@Slf4j
 public class OrderApplication {
     @Autowired
     OrderService orderService;
@@ -35,6 +37,7 @@ public class OrderApplication {
 
     @Transactional
     public OrderDomain createBuyNowOrder(OrderDomain orderDomain) {
+        log.info("OrderApp1.1: create new order [id = {}]", orderDomain.getOrderNumber());
         // 新建流水记录: LOCK_STOCK
         promotionStockLogServiceApi.createPromotionStockLog(toPromotionStockLogDomain(orderDomain, OperationName.LOCK_STOCK));
         // send a message to MQ

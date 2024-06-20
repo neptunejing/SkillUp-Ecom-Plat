@@ -58,7 +58,7 @@ public class CreateOrderTxnMsgHandler implements TransactionMessageHandler {
             orderService.createOrder(orderDomain);
             // send a 'pay-check' message
             mqSendRepo.sendDelayMsgToTopic(payCheckTopic, JSON.toJSONString(orderDomain), delaySeconds);
-            log.info("OrderApp: sent pay-check message. OrderId: " + orderDomain.getOrderNumber());
+            log.info("OrderApp2.1: sent pay-check message. OrderId: " + orderDomain.getOrderNumber());
         } catch (Exception e) {
             stockDomain.setOperationName(OperationName.REVERT_STOCK);
             stockServiceApi.revertAvailableStock(stockDomain);
