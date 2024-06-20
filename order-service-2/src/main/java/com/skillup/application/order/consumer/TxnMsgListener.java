@@ -42,7 +42,7 @@ public class TxnMsgListener implements RocketMQLocalTransactionListener {
             }
             state = messageHandler.executeLocalTransaction(payload, null);
         } catch (Exception e) {
-            log.error("rocket transaction message executeLocal error:{}", e.getMessage());
+            log.error("RocketMQ executeLocalTxn error:{}", e.getMessage());
             return RocketMQLocalTransactionState.ROLLBACK;
         }
 
@@ -65,7 +65,7 @@ public class TxnMsgListener implements RocketMQLocalTransactionListener {
             }
             state = messageHandler.checkLocalTransaction(message.getPayload());
         } catch (Exception e) {
-            log.error("rocket transaction message executeLocal error:{}", e.getMessage());
+            log.error("RocketMQ checkLocalTxn error:{}", e.getMessage());
             return RocketMQLocalTransactionState.ROLLBACK;
         }
         return state;

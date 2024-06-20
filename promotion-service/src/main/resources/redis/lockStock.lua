@@ -3,7 +3,7 @@
 if redis.call('exists', KEYS[1]) == 1
 then
     -- idempotence check
-    if redis.call('exists', KEYS[2]) == 1 and redis.call('get', KEYS[2]) == KEYS[3]
+    if redis.call('exists', KEYS[2]) == 1 and redis.call('get', KEYS[2]) == ARGV[1]
     then
         return redis.call('get', KEYS[1]);
     end
@@ -15,7 +15,7 @@ then
         -- stock > 0 and lock stock
         redis.call('set', KEYS[1], stock - 1);
         -- add a new (ORDER_ID, OPERATION_NAME)
-        redis.call('set', KEYS[2], KEYS[3]);
+        redis.call('set', KEYS[2], ARGV[1]);
         return stock - 1;
     end
     -- sold out

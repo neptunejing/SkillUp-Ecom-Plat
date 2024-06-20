@@ -63,6 +63,7 @@ public class JooqPromotionRepo implements PromotionRepository, StockOperation {
 
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public boolean deductPromotionStock(String promotionId) {
         /**
          * update promotion
@@ -78,6 +79,7 @@ public class JooqPromotionRepo implements PromotionRepository, StockOperation {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public boolean revertPromotionStock(String promotionId) {
         /**
          * update promotion
