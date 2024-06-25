@@ -3,6 +3,7 @@ package com.skillup.application.order.consumer.createOrder;
 import com.alibaba.fastjson.JSON;
 import com.skillup.application.order.MQSendRepo;
 import com.skillup.application.order.consumer.TransactionMessageHandler;
+import com.skillup.application.order.consumer.createOrder.util.OrderErrorLogHandler;
 import com.skillup.application.promotion.StockServiceApi;
 import com.skillup.domain.order.OrderDomain;
 import com.skillup.domain.order.OrderService;
@@ -31,6 +32,9 @@ public class CreateOrderTxnMsgHandler implements TransactionMessageHandler {
     @Autowired
     OrderService orderService;
 
+    @Autowired
+    OrderErrorLogHandler orderErrorLogHandler;
+
     @Value("${order.topic.pay-check}")
     String payCheckTopic;
 
@@ -49,7 +53,7 @@ public class CreateOrderTxnMsgHandler implements TransactionMessageHandler {
                 .build();
         boolean isLocked = stockServiceApi.lockAvailableStock(stockDomain);
         if (!isLocked) {
-            log.info("[Out of Stock] CreateOrderTxnMsg Rollback");
+            log.warn("[OrderApp1.2] out of stock! CreateOrderTxnMsg Rollback");
             return RocketMQLocalTransactionState.ROLLBACK;
         }
         try {
@@ -58,11 +62,12 @@ public class CreateOrderTxnMsgHandler implements TransactionMessageHandler {
             orderService.createOrder(orderDomain);
             // send a 'pay-check' message
             mqSendRepo.sendDelayMsgToTopic(payCheckTopic, JSON.toJSONString(orderDomain), delaySeconds);
-            log.info("OrderApp1.2: sent pay-check message. OrderId: " + orderDomain.getOrderNumber());
+            log.info("[OrderApp1.2] sent pay-check message. OrderId: {}", orderDomain.getOrderNumber());
         } catch (Exception e) {
             stockDomain.setOperationName(OperationName.REVERT_STOCK);
             stockServiceApi.revertAvailableStock(stockDomain);
-            log.info("[Create Order Error] CreateOrderTxnMsg Rollback");
+            orderErrorLogHandler.log(orderDomain.getOrderNumber());
+            log.error("[OrderApp1.2] create order error. OrderId: {}", orderDomain.getOrderNumber());
             return RocketMQLocalTransactionState.ROLLBACK;
         }
         return RocketMQLocalTransactionState.COMMIT;
@@ -72,12 +77,16 @@ public class CreateOrderTxnMsgHandler implements TransactionMessageHandler {
     public RocketMQLocalTransactionState checkLocalTransaction(Object payload) {
         String messageBody = new String((byte[]) payload, StandardCharsets.UTF_8);
         OrderDomain orderDomain = JSON.parseObject(messageBody, OrderDomain.class);
+        // redis 存在订单创建失败记录，告知 broker 回滚
+        if (orderErrorLogHandler.ifErrorLogExists(orderDomain.getOrderNumber())) {
+            return RocketMQLocalTransactionState.ROLLBACK;
+        }
         OrderDomain existedOrderDomain = orderService.getOrderById(orderDomain.getOrderNumber());
         if (!Objects.isNull(existedOrderDomain)) {
-            // 订单存在，直接 COMMIT
+            // DB 存在订单，告知 broker 提交
             return RocketMQLocalTransactionState.COMMIT;
         }
-        // 否则 ROLLBACK
-        return RocketMQLocalTransactionState.ROLLBACK;
+        // 否则继续回查
+        return RocketMQLocalTransactionState.UNKNOWN;
     }
 }

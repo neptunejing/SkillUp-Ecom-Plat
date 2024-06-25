@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 @Repository
-public class RedisRepo implements StockRepository, PromotionCacheRepository {
+public class PromotionRedisRepo implements StockRepository, PromotionCacheRepository {
     @Autowired
     RedisTemplate<String, String> redisTemplate;
 

@@ -22,6 +22,18 @@ spring:
   flyway:
     baseline-on-migrate: true
     enabled: true
+  redis:
+    database: 0
+    host: localhost
+    port: 6379
+    # 连接超时时间
+    timeout: 0
+    lettuce:
+      pool:
+        max-active: 200 # 连接池最大连接数（负值表示无限制）
+        max-wait: -1 # 连接池最大阻塞等待时间
+        max-idle: 8 # 连接池最大空闲连接
+        min-idle: 0 # 连接池最小空闲连接
 
 # Custom Config
 feign:
