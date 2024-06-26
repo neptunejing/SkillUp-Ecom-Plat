@@ -1,0 +1,24 @@
+server:
+  port: 8002
+
+spring:
+  application:
+    name: commodity-service # consul 注册中心相关配置
+  cloud:
+    consul:
+      host: consul
+      port: 8500
+      discovery: # 是否注册（默认 true）
+        register: true
+        # 服务名称
+        service-name: ${spring.application.name}
+        # 展示实例 ip（默认 false）
+        prefer-ip-address: true
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://mysql:3306/commodity-service
+    username: root
+    password: 123456
+  flyway:
+    baseline-on-migrate: true
+    enabled: true
