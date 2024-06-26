@@ -18,6 +18,9 @@ services:
       - skillup
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+      - TZ=Europe/Helsinki
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
     depends_on:
       - gateway
 

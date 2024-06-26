@@ -17,7 +17,7 @@ function setCookie(name,value)
     console.log("server_now: " + exp);
     console.log("GMT_now: " + exp.toGMTString());
     exp.setTime(exp.getTime() + min*60*1000);
-    console.log("server_exp: " + exp.toGMTString());
+    console.log("server_exp: " + exp);
     console.log("GMT_exp: " + exp.toGMTString());
     document.cookie = name + "="+ escape (value) + ";expires=" + exp.toGMTString();
 }
