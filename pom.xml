@@ -7,167 +7,160 @@
     <groupId>com.skillup</groupId>
     <artifactId>skillup-ecom-plat</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>template</module>
+        <module>user-service</module>
+        <module>commodity-service</module>
+        <module>promotion-service</module>
+        <module>order-service-1</module>
+        <module>order-service-1.2</module>
+        <module>order-service-2</module>
+        <module>order-service-2.2</module>
+        <module>frontend-service</module>
+        <module>gateway-service</module>
+    </modules>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring-boot.version>2.7.3</spring-boot.version>
+        <spring-cloud.version>3.1.2</spring-cloud.version>
+        <mysql-connector.version>8.0.30</mysql-connector.version>
+        <flyway-mysql.version>8.5.13</flyway-mysql.version>
+        <jooq-codegen.version>3.14.16</jooq-codegen.version>
+        <rocketmq.version>2.2.3</rocketmq.version>
+        <lombok.version>1.18.30</lombok.version>
+        <map-struct.version>1.6.0.Beta1</map-struct.version>
+        <fastjson.version>2.0.31</fastjson.version>
+        <okhttp.version>11.10</okhttp.version>
     </properties>
 
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.3</version>
-        <relativePath/>
-    </parent>
+    <dependencyManagement>
+        <dependencies>
+            <!-- spring boot -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
+            <!-- mysql -->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql-connector.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-jdbc</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
+            <!-- flyway -->
+            <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-mysql</artifactId>
+                <version>${flyway-mysql.version}</version>
+            </dependency>
+
+            <!-- jooq -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-jooq</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq-codegen</artifactId>
+                <scope>provided</scope>
+                <version>${jooq-codegen.version}</version>
+            </dependency>
+
+            <!-- redis -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-redis</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
+            <!-- RocketMQ -->
+            <dependency>
+                <groupId>org.apache.rocketmq</groupId>
+                <artifactId>rocketmq-spring-boot-starter</artifactId>
+                <version>${rocketmq.version}</version>
+            </dependency>
+
+            <!-- fastjson -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+
+            <!-- openFeign -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-openfeign</artifactId>
+                <version>${spring-cloud.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.openfeign</groupId>
+                <artifactId>feign-okhttp</artifactId>
+                <version>${okhttp.version}</version>
+            </dependency>
+
+            <!-- spring cloud gateway -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-gateway</artifactId>
+                <version>${spring-cloud.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jdbc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-mysql</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jooq</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jooq</groupId>
-            <artifactId>jooq-codegen</artifactId>
-            <scope>provided</scope>
-        </dependency>
+        <!-- lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.30</version>
+            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- mapstruct -->
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
-            <version>1.6.0.Beta1</version>
+            <version>${map-struct.version}</version>
         </dependency>
 
-        <!-- redis -->
+        <!-- consul -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+            <version>${spring-cloud.version}</version>
+        </dependency>
+
+        <!-- actuator 用于监控和管理 Spring Boot 应用程序，可以进行配置查看、健康监控等 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
-
-        <!-- RocketMQ -->
-        <dependency>
-            <groupId>org.apache.rocketmq</groupId>
-            <artifactId>rocketmq-spring-boot-starter</artifactId>
-            <version>2.2.3</version>
-        </dependency>
-
-        <!-- fastjson -->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>2.0.31</version>
-        </dependency>
-
-        <!-- test tools -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+            <version>${spring-boot.version}</version>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
-                <groupId>org.jooq</groupId>
-                <artifactId>jooq-codegen-maven</artifactId>
-                <version>3.14.16</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <!-- JOOQ JDBC-->
-                    <jdbc>
-                        <driver>com.mysql.jdbc.Driver</driver>
-                        <url>jdbc:mysql://localhost:3306/skillup</url>
-                        <user>root</user>
-                        <password>123456</password>
-                    </jdbc>
-                    <generator>
-                        <name>org.jooq.codegen.JavaGenerator</name>
-                        <database>
-                            <name>org.jooq.meta.mysql.MySQLDatabase</name>
-                            <includes>.*</includes>
-                            <excludes>
-                                flyway_schema_history
-                            </excludes>
-                            <inputSchema>skillup</inputSchema>
-                        </database>
-                        <generate>
-                            <javaTimeTypes>true</javaTimeTypes>
-                            <springAnnotations>ture</springAnnotations>
-                        </generate>
-                        <target>
-                            <packageName>com.skillup.infrastructure.jooq</packageName>
-                            <directory>src/main/java</directory>
-                        </target>
-                    </generator>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-            <!-- MapStruct -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.mapstruct</groupId>
-                            <artifactId>mapstruct-processor</artifactId>
-                            <version>1.5.5.Final</version>
-                        </path>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>1.18.30</version>
-                        </path>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok-mapstruct-binding</artifactId>
-                            <version>0.2.0</version>
-                        </path>
-                    </annotationProcessorPaths>
-                </configuration>
+                <version>${spring-boot.version}</version>
             </plugin>
         </plugins>
     </build>

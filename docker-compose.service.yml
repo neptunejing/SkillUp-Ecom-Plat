@@ -1,0 +1,121 @@
+services:
+  gateway:
+    build: gateway-service
+    container_name: gateway
+    ports:
+      - "8090:8090"
+    networks:
+      - skillup
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+
+  user-service:
+    build: user-service
+    container_name: user-service
+    ports:
+      - "8001:8001"
+    networks:
+      - skillup
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - TZ=Europe/Helsinki
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - gateway
+
+  commodity-service:
+    build: commodity-service
+    container_name: commodity-service
+    ports:
+      - "8002:8002"
+    networks:
+      - skillup
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
+      - gateway
+
+  promotion-service:
+    build: promotion-service
+    container_name: promotion-service
+    ports:
+      - "8003:8003"
+    networks:
+      - skillup
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
+      - commodity-service
+      - gateway
+
+  order-service-1-1:
+    build: order-service-1
+    container_name: order-service-1-1
+    ports:
+      - "8004:8004"
+    networks:
+      - skillup
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
+      - gateway
+      - promotion-service
+
+  order-service-1-2:
+    build: order-service-1.2
+    container_name: order-service-1-2
+    ports:
+      - "8014:8014"
+    networks:
+      - skillup
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
+      - gateway
+      - promotion-service
+
+  order-service-2-1:
+    build: order-service-2
+    container_name: order-service-2-1
+    ports:
+      - "8005:8005"
+    networks:
+      - skillup
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
+      - gateway
+      - promotion-service
+
+  order-service-2-2:
+    build: order-service-2.2
+    container_name: order-service-2-2
+    ports:
+      - "8015:8015"
+    networks:
+      - skillup
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
+      - gateway
+      - promotion-service
+
+  frontend-service:
+    build: frontend-service
+    container_name: frontend-service
+    ports:
+      - "8010:8010"
+    networks:
+      - skillup
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
+      - gateway
+      - promotion-service
+      - commodity-service
+
+networks:
+  skillup:
+    name: skillup_net
+    driver: bridge
