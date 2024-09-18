@@ -1,4 +1,4 @@
-package com.skillup.application.order.consumer.payCheck;
+package com.skillup.application.order.consumer;
 
 import com.alibaba.fastjson.JSON;
 import com.skillup.application.order.MQSendRepo;

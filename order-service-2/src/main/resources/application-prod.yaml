@@ -42,6 +42,13 @@ feign:
 
 promotion:
   stock-strategy: optimistic # [overall, sync, optimistic]
+  topic:
+    lock-stock: lock-stock
+    lock-stock-group: LS-G
+    revert-stock: revert-stock
+    revert-stock-group: RS-G
+    deduct-stock: deduct-stock
+    deduct-stock-group: DS-G
 
 order:
   dataCenter: 2
