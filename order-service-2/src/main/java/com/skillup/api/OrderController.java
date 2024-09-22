@@ -52,9 +52,7 @@ public class OrderController {
         if (Objects.isNull(orderDomain)) {
             return ResponseEntity.status(SkillUpCommon.BAD_REQUEST).body(null);
         }
-        // mock 获取异步支付结果
-        CompletableFuture<OrderDomain> future = CompletableFuture.supplyAsync(() -> this.asyncGetPaymentResult(orderDomain.getOrderNumber()));
-        OrderDomain orderDomainAfterPayment = future.get();
+        OrderDomain orderDomainAfterPayment = orderService.getOrderById(orderDomain.getOrderNumber());
         OrderStatus orderStatusAfterPayment = orderDomainAfterPayment.getOrderStatus();
         if (orderStatusAfterPayment.equals(OrderStatus.PAID)) {
             return ResponseEntity.status(SkillUpCommon.SUCCESS).body(toOutDto(orderDomainAfterPayment));
@@ -91,14 +89,5 @@ public class OrderController {
                 .createTime(orderDomain.getCreateTime())
                 .payTime(orderDomain.getPayTime())
                 .build();
-    }
-
-    private OrderDomain asyncGetPaymentResult(Long orderNumber) {
-        try {
-            Thread.sleep(2000);
-            return orderService.getOrderById(orderNumber);
-        } catch (InterruptedException e) {
-            return null;
-        }
     }
 }

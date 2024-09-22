@@ -1,13 +1,12 @@
-package com.skillup.application.order.consumer.payOrder;
+package com.skillup.application.promotion.consumer;
+
 
 import com.alibaba.fastjson.JSON;
 import com.skillup.application.promotion.PromotionServiceApi;
 import com.skillup.application.promotion.PromotionStockLogServiceApi;
 import com.skillup.domain.order.OrderDomain;
-import com.skillup.domain.order.OrderService;
 import com.skillup.domain.promotionStockLog.PromotionStockLogDomain;
 import com.skillup.domain.promotionStockLog.util.OperationName;
-import com.skillup.domain.promotionStockLog.util.OperationStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
@@ -17,38 +16,41 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Component
 @Slf4j
-@RocketMQMessageListener(topic = "${order.topic.pay-order}", consumerGroup = "${order.topic.pay-order-group}")
-public class PayOrderConsumer implements RocketMQListener<MessageExt> {
-    @Autowired
-    PromotionStockLogServiceApi promotionStockLogServiceApi;
-
+@RocketMQMessageListener(topic = "${promotion.topic.deduct-stock}", consumerGroup = "${promotion.topic.deduct-stock-group}")
+public class DeductStockConsumer implements RocketMQListener<MessageExt> {
     @Autowired
     PromotionServiceApi promotionServiceApi;
 
     @Autowired
-    OrderService orderService;
+    PromotionStockLogServiceApi promotionStockLogServiceApi;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void onMessage(MessageExt messageExt) {
         String messageBody = new String(messageExt.getBody(), StandardCharsets.UTF_8);
         OrderDomain orderDomain = JSON.parseObject(messageBody, OrderDomain.class);
         PromotionStockLogDomain promotionStockLogDomain = promotionStockLogServiceApi.getLogByOrderIdAndOperation(orderDomain.getOrderNumber(), OperationName.DEDUCT_STOCK.toString());
-        if (promotionStockLogDomain.getStatus() != OperationStatus.INIT) {
+        // 幂等性检查：流水记录非 INIT 就直接返回
+        if (!Objects.isNull(promotionStockLogDomain)) {
             return;
         }
-        try {
-            promotionServiceApi.deductPromotionStock(orderDomain.getPromotionId());
-            promotionStockLogDomain.setStatus(OperationStatus.CONSUMED);
-        } catch (Exception e) {
-            promotionStockLogDomain.setStatus(OperationStatus.ROLLBACK);
-            log.error("PayOrderConsumer: deduct promotion stock error");
-            throw e;
-        } finally {
-            promotionStockLogServiceApi.updatePromotionStockLog(promotionStockLogDomain);
-        }
+        log.info("PromotionApp: received deduct-stock message. OrderId: " + orderDomain.getOrderNumber());
+        promotionServiceApi.deductPromotionStock(orderDomain.getPromotionId());
+        promotionStockLogServiceApi.createPromotionStockLog(toPromotionStockLogDomain(orderDomain));
+    }
+
+    private PromotionStockLogDomain toPromotionStockLogDomain(OrderDomain orderDomain) {
+        return PromotionStockLogDomain.builder()
+                .promotionId(orderDomain.getPromotionId())
+                .orderNumber(orderDomain.getOrderNumber())
+                .userId(orderDomain.getUserId())
+                .operationName(OperationName.DEDUCT_STOCK)
+                .createTime(LocalDateTime.now())
+                .build();
     }
 }

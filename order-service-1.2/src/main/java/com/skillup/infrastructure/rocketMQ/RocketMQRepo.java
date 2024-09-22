@@ -44,18 +44,6 @@ public class RocketMQRepo implements MQSendRepo {
         }
     }
 
-    @Override
-    public TransactionSendResult sendTxnMsg(String topic, String originMsg) {
-        try {
-            TransactionSendResult result = rocketMQTemplate.sendMessageInTransaction(topic, MessageBuilder.withPayload(originMsg)
-                    .setHeader("TXN_MESSAGE_HEADER", topic).build(), null);
-            log.info("-- send a transactional message to rocketMQ. Topic: " + topic + " --");
-            return result;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private Integer secondsToRocketMQLevel(Integer delaySeconds) {
         if (delaySeconds <= 1) return 1;
         if (delaySeconds <= 5) return 2;

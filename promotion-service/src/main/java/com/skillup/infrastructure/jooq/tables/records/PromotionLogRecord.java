@@ -9,7 +9,7 @@ import com.skillup.infrastructure.jooq.tables.PromotionLog;
 import java.time.LocalDateTime;
 
 import org.jooq.Field;
-import org.jooq.Record3;
+import org.jooq.Record2;
 import org.jooq.Record6;
 import org.jooq.Row6;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -112,8 +112,8 @@ public class PromotionLogRecord extends UpdatableRecordImpl<PromotionLogRecord> 
     // -------------------------------------------------------------------------
 
     @Override
-    public Record3<Long, String, Integer> key() {
-        return (Record3) super.key();
+    public Record2<Long, String> key() {
+        return (Record2) super.key();
     }
 
     // -------------------------------------------------------------------------
