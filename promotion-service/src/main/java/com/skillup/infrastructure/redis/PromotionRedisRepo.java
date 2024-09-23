@@ -42,7 +42,7 @@ public class PromotionRedisRepo implements StockRepository, PromotionCacheReposi
             Long stock = redisTemplate.execute(redisLockScript,
                     Arrays.asList(
                             StockDomain.createStockKey(stockDomain.getPromotionId()),
-                            stockDomain.getOrderId().toString()
+                            createHashTaggedKey(stockDomain.getOrderId().toString(), stockDomain.getPromotionId())
                     ), stockDomain.getOperationName().toString());
             if (stock >= 0) {
                 return true;
@@ -61,7 +61,7 @@ public class PromotionRedisRepo implements StockRepository, PromotionCacheReposi
             Long stock = redisTemplate.execute(redisRevertScript,
                     Arrays.asList(
                             StockDomain.createStockKey(stockDomain.getPromotionId()),
-                            stockDomain.getOrderId().toString()
+                            createHashTaggedKey(stockDomain.getOrderId().toString(), stockDomain.getPromotionId())
                     ), stockDomain.getOperationName().toString());
             if (stock > 0) {
                 return true;
@@ -83,6 +83,10 @@ public class PromotionRedisRepo implements StockRepository, PromotionCacheReposi
     public void setPromotionAvailableStock(String promotionId, Long availableStock) {
         String key = StockDomain.createStockKey(promotionId);
         set(key, availableStock);
+    }
+
+    private String createHashTaggedKey(String orderId, String promotionId) {
+        return orderId + ":" + "{" + promotionId + "}";
     }
 
     @Override
