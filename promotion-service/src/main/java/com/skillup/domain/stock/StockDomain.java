@@ -24,6 +24,6 @@ public class StockDomain {
     public static final String STOCK_SUFFIX = "_STOCK";
 
     public static String createStockKey(String promotionId) {
-        return PROMOTION_PREFIX + promotionId + STOCK_SUFFIX;
+        return PROMOTION_PREFIX + "{" + promotionId + "}" + STOCK_SUFFIX;
     }
 }

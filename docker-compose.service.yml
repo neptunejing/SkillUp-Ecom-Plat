@@ -119,3 +119,4 @@ networks:
   skillup:
     name: skillup_net
     driver: bridge
+    external: true
