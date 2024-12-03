@@ -1,5 +1,6 @@
 package com.skillup.infrastructure.mybatis;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.skillup.domain.order.OrderDomain;
 import com.skillup.domain.order.OrderRepository;
 import com.skillup.domain.order.util.OrderStatus;
@@ -25,11 +26,12 @@ public class batisOrderRepo implements OrderRepository {
     @Override
     @Transactional
     public OrderDomain getOrderById(Long orderId) {
-        Order order = orderMapper.selectById(orderId);
-        if (Objects.isNull(order)) {
-            return null;
-        }
-        return toDomain(orderMapper.selectById(orderId));
+        QueryWrapper<Order> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("order_number", orderId)
+                .last("FOR UPDATE");
+
+        Order order = orderMapper.selectOne(queryWrapper);
+        return Objects.isNull(order) ? null : toDomain(order);
     }
 
     @Override
