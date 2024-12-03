@@ -6,10 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+
 @Service(value = "overall")
 @Slf4j
 public class OversellStrategy implements StockOperation {
-    @Autowired
+    @Resource(name = "${promotion.stock-strategy}")
     PromotionRepository promotionRepository;
 
     @Override

@@ -6,10 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+
 @Service(value = "sync")
 @Slf4j
 public class SyncStrategy implements StockOperation {
-    @Autowired
+    @Resource(name = "${promotion.stock-strategy}")
     PromotionRepository promotionRepository;
 
     @Override

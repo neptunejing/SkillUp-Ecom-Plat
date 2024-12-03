@@ -47,4 +47,4 @@ spring:
 
 # Custom Config
 promotion:
-  stock-strategy: optimistic # [overall, sync, optimistic]
+  stock-strategy: optimisticBatis # [overall, sync, optimisticJooq, optimisticBatis]
