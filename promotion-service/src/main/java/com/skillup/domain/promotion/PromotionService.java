@@ -2,6 +2,7 @@ package com.skillup.domain.promotion;
 
 import com.skillup.domain.promotion.stockStrategy.StockOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,7 +12,7 @@ import java.util.List;
 
 @Service
 public class PromotionService {
-    @Autowired
+    @Resource(name = "${promotion.stock-strategy}")
     PromotionRepository promotionRepository;
 
     @Resource(name = "${promotion.stock-strategy}")

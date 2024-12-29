@@ -38,6 +38,7 @@
         <map-struct.version>1.6.0.Beta1</map-struct.version>
         <fastjson.version>2.0.31</fastjson.version>
         <okhttp.version>11.10</okhttp.version>
+        <mybatis-plus.version>3.5.9</mybatis-plus.version>
     </properties>
 
     <dependencyManagement>
@@ -45,8 +46,10 @@
             <!-- spring boot -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-web</artifactId>
+                <artifactId>spring-boot-dependencies</artifactId>
                 <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
             <!-- mysql -->
@@ -79,6 +82,13 @@
                 <artifactId>jooq-codegen</artifactId>
                 <scope>provided</scope>
                 <version>${jooq-codegen.version}</version>
+            </dependency>
+
+            <!-- mybatis-plus -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
             </dependency>
 
             <!-- redis -->
@@ -125,6 +135,12 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
