@@ -17,6 +17,15 @@
 
 ## 环境准备
 
+> **配置修改**
+> 
+> 配置环境时需要修改下方配置：
+> - 修改 IP：**重要**，需要修改的概率不小
+>   - 宿主机 IP 会发生更改，此时需要修改 `broker.conf` 的 `brokerIP1` 字段；其次需要修改 `redis-cluster.tmpl` 中的 `cluster-announce-ip`
+>  - 容器虚拟 IP 会发生更改，此时执行 `redis-cli --cluster create` 创建集群时的 IP 可能需要更新
+> - 用到 MySQL 的服务需要修改 `application.yaml`，`application.prod.yaml`，`docker-compose.env.yml` 的 MySQL 密码
+> - 修改 `docker-compose.service.yml` 中 user-service 环境变量的时区 `TZ=Europe/Helsinki` 为实际时区（否则容器化运行时，前端设置 cookies 可能直接过期）
+
 ### 克隆仓库
 
 ```
@@ -56,7 +65,20 @@ docker exec -it redis-6379 bash
 
 创建集群：
 ```shell
-# 节点在 skillup_net 下的 IP
+# 写法一：直接使用宿主机 IP（适合 IP 不变的情况）
+redis-cli --cluster create \
+192.168.31.214:6379 192.168.31.214:6380 192.168.31.214:6381 \
+192.168.31.214:6382 192.168.31.214:6383 192.168.31.214:6384 \
+--cluster-replicas 1
+
+# 写法二：使用节点名称（start.sh 创建节点时需要 --name 指定名称）
+redis-cli --cluster create \
+redis-6379:6379 redis-6380:6380 redis-6381:6381 \
+redis-6382:6382 redis-6383:6383 redis-6384:6384 \
+--cluster-replicas 1
+```shell
+
+# 写法三：节点在 skillup_net 网络下的 IP
 redis-cli --cluster create 172.19.0.2:6379 172.19.0.3:6380 172.19.0.4:6381 172.19.0.5:6382 172.19.0.6:6383 172.19.0.7:6384 --cluster-replicas 1
 ```
 
@@ -96,15 +118,6 @@ useEpollNativeSelector = true
 ---
 
 ## 运行
-
-### 配置修改
-
-- 修改 IP：**重要**，需要修改的概率不小
-  - 宿主机 IP 会发生更改，此时需要修改 `broker.conf` 的 `brokerIP1` 字段；其次需要修改 `redis-cluster.tmpl` 中的 `cluster-announce-ip`
-  - 容器虚拟 IP 会发生更改，此时执行 `redis-cli --cluster create` 创建集群时的 IP 按容器要按实际填写
-
-- 用到 MySQL 的服务需要修改 `application.yaml`，`application.prod.yaml`，`docker-compose.env.yml` 的 MySQL 密码
-- 修改 `docker-compose.service.yml` 中 user-service 环境变量的时区 `TZ=Europe/Helsinki` 为实际时区（否则容器化运行时，前端设置 cookies 可能直接过期）
 
 ### 启动环境服务
 
