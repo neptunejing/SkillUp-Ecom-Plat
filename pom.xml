@@ -52,6 +52,20 @@
                 <scope>import</scope>
             </dependency>
 
+            <!-- consul -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+                <version>${spring-cloud.version}</version>
+            </dependency>
+
+            <!-- actuator -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-actuator</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
             <!-- mysql -->
             <dependency>
                 <groupId>mysql</groupId>
@@ -154,20 +168,6 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${map-struct.version}</version>
-        </dependency>
-
-        <!-- consul -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-consul-discovery</artifactId>
-            <version>${spring-cloud.version}</version>
-        </dependency>
-
-        <!-- actuator 用于监控和管理 Spring Boot 应用程序，可以进行配置查看、健康监控等 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-            <version>${spring-boot.version}</version>
         </dependency>
     </dependencies>
 
