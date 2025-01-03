@@ -9,6 +9,7 @@ import com.skillup.domain.promotion.PromotionDomain;
 import com.skillup.domain.promotion.PromotionService;
 import com.skillup.domain.stock.StockDomain;
 import com.skillup.domain.stock.StockService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping("/promotion")
 public class PromotionController {
@@ -92,6 +94,7 @@ public class PromotionController {
         if (isReverted) {
             return ResponseEntity.status(SkillUpCommon.SUCCESS).body(true);
         }
+        log.error("Revert promotion stock failed, promotionId={}", promotionId);
         return ResponseEntity.status(SkillUpCommon.SUCCESS).body(false);
     }
 }

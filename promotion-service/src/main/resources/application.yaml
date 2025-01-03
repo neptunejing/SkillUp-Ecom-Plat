@@ -45,6 +45,14 @@ spring:
   session:
     store-type: none
 
+logging:
+  file:
+    name: logs/PromotionApp.log  # 日志文件路径和名称
+    level:
+      root: info  # 默认日志级别
+    pattern:
+      file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
 # Custom Config
 promotion:
   stock-strategy: optimisticBatis # [overall, sync, optimisticJooq, optimisticBatis]
