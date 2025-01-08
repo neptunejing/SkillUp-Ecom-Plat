@@ -24,12 +24,7 @@ spring:
     enabled: true
 
 logging:
-  file:
-    name: logs/OrderApp2.log  # 日志文件路径和名称
-    level:
-      root: info  # 默认日志级别
-    pattern:
-      file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  config: classpath:logback-spring.xml
 
 # Custom Config
 feign:
