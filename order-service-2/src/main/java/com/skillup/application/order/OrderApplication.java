@@ -9,7 +9,6 @@ import com.skillup.domain.promotionStockLog.PromotionStockLogDomain;
 import com.skillup.domain.promotionStockLog.util.OperationName;
 import com.skillup.domain.promotionStockLog.util.OperationStatus;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.rocketmq.spring.core.RocketMQLocalTransactionState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -43,7 +42,7 @@ public class OrderApplication {
 
     @Transactional
     public OrderDomain createBuyNowOrder(OrderDomain orderDomain) {
-        log.info("OrderApp1.2: create new order [id = {}]", orderDomain.getOrderNumber());
+        log.info("Create new order [id = {}]", orderDomain.getOrderNumber());
         // 新建流水记录: LOCK_STOCK
         promotionStockLogServiceApi.createPromotionStockLog(toPromotionStockLogDomain(orderDomain, OperationName.LOCK_STOCK));
         mqSendRepo.sendMsgToTopic(createOrderTopic, JSON.toJSONString(orderDomain));
@@ -88,7 +87,7 @@ public class OrderApplication {
                 throw new RuntimeException();
             }
         } catch (Exception e) {
-            log.error("[Payment Error]" + e.getMessage());
+            log.error("Payment Error. {}", e.getMessage());
             orderDomain.setOrderStatus(OrderStatus.ITEM_ERROR);
             orderService.updateOrder(orderDomain);
         }

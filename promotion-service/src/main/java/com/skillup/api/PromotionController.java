@@ -7,7 +7,6 @@ import com.skillup.api.util.SkillUpCommon;
 import com.skillup.application.promotion.PromotionApplication;
 import com.skillup.domain.promotion.PromotionDomain;
 import com.skillup.domain.promotion.PromotionService;
-import com.skillup.domain.stock.StockDomain;
 import com.skillup.domain.stock.StockService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,7 +93,6 @@ public class PromotionController {
         if (isReverted) {
             return ResponseEntity.status(SkillUpCommon.SUCCESS).body(true);
         }
-        log.error("Revert promotion stock failed, promotionId={}", promotionId);
         return ResponseEntity.status(SkillUpCommon.SUCCESS).body(false);
     }
 }

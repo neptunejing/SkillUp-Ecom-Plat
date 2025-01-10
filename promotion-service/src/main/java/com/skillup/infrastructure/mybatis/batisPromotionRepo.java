@@ -69,9 +69,15 @@ public class batisPromotionRepo implements PromotionRepository, StockOperation {
     }
 
     @Override
+    @Transactional
     public boolean revertPromotionStock(String promotionId) {
         log.info("----- Optimistic Strategy: Revert -----");
-        int isReverted = promotionMapper.revertPromotionStock(promotionId);
+        int isReverted = 0;
+        try {
+            isReverted = promotionMapper.revertPromotionStock(promotionId);
+        } catch (Exception e) {
+            log.error("[Batis] Revert DB stock failed, promotionId={}. {}", promotionId, e.getMessage());
+        }
         return isReverted == 1;
     }
 
