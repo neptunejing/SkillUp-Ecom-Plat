@@ -2,7 +2,6 @@ package com.skillup.infrastructure.rocketMQ;
 
 import com.skillup.application.order.MQSendRepo;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.rocketmq.client.producer.TransactionSendResult;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,28 +18,23 @@ public class RocketMQRepo implements MQSendRepo {
 
     @Override
     public void sendMsgToTopic(String topic, String originMsg) {
-        // 1. create msg
-        Message message = new Message(topic, originMsg.getBytes(StandardCharsets.UTF_8));
-        // 2. send msg to related topic
         try {
-            rocketMQTemplate.getProducer().send(message);
-            log.info("-- send a message to rocketMQ. Topic: " + topic + " --");
+            rocketMQTemplate.send(topic, MessageBuilder.withPayload(originMsg).build());
+            log.info("Send message [{}].", topic);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.error("Send message failed [{}]. {}", topic, e.getMessage());
         }
     }
 
     @Override
     public void sendDelayMsgToTopic(String topic, String originMsg, int delaySeconds) {
-        // 1. create msg
         Message message = new Message(topic, originMsg.getBytes(StandardCharsets.UTF_8));
         message.setDelayTimeLevel(secondsToRocketMQLevel(delaySeconds));
-        // 2. send msg to related topic
         try {
             rocketMQTemplate.getProducer().send(message);
-            log.info("-- send a delayed message to rocketMQ. Topic: " + topic + " --");
+            log.info("Send delayed message [{}].", topic);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.error("Send delayed message failed [{}].{}", topic, e.getMessage());
         }
     }
 

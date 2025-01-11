@@ -48,10 +48,11 @@ public class PayCheckConsumer implements RocketMQListener<MessageExt> {
     public void onMessage(MessageExt messageExt) {
         String messageBody = new String(messageExt.getBody(), StandardCharsets.UTF_8);
         OrderDomain orderDomain = JSON.parseObject(messageBody, OrderDomain.class);
-        log.info("OrderApp1.2: received pay-check message. OrderId: " + orderDomain.getOrderNumber());
+        log.info("Received pay-check message [id = {}].", orderDomain.getOrderNumber());
         OrderDomain currOrder = orderService.getOrderById(orderDomain.getOrderNumber());
         if (Objects.isNull(currOrder)) {
-            throw new RuntimeException("Order doesn't exist.");
+            log.error("Order doesn't exist [id = {}].", orderDomain.getOrderNumber());
+            throw new RuntimeException("Order doesn't exist."); // 抛出异常触发 MQ 重试
         }
         OrderStatus currOrderStatus = currOrder.getOrderStatus();
         // didn't pay within the delay time
@@ -59,7 +60,6 @@ public class PayCheckConsumer implements RocketMQListener<MessageExt> {
             // update order status
             currOrder.setOrderStatus(OrderStatus.OVERTIME);
             orderService.updateOrder(currOrder);
-            // revert cached stock
             StockDomain stockDomain = StockDomain.builder()
                     .promotionId(orderDomain.getPromotionId())
                     .orderId(orderDomain.getOrderNumber())
@@ -69,15 +69,13 @@ public class PayCheckConsumer implements RocketMQListener<MessageExt> {
             // revert DB stock
             promotionServiceApi.revertPromotionStock(orderDomain.getPromotionId());
         } else if (currOrderStatus.equals(OrderStatus.PAID)) {
-            // paid successfully: stock should be deducted once the payment was done
-            log.info("Order (Id: " + orderDomain.getOrderNumber() + ") has been paid successfully");
+            log.info("Order [orderId = {}] has been paid successfully.", orderDomain.getOrderNumber());
         } else if (currOrderStatus.equals(OrderStatus.PAYING)) {
             // 如果时延检查遇到 paying 状态，以 delaySeconds / 10 为延迟再次发送时延消息
             // 获取异步支付结果的 get() 设置为 3s 后返回并认定失败，delaySeconds / 10 后订单要么支付成功要么失败
             mqSendRepo.sendDelayMsgToTopic(payCheckTopic, JSON.toJSONString(orderDomain), delaySeconds / 10);
         } else {
-            // the order is already overtime or cancelled
-            log.info("Order (Id: " + orderDomain.getOrderNumber() + ") is already overtime/cancelled");
+            log.info("Order [orderId = {}] is already overtime/cancelled.", orderDomain.getOrderNumber());
         }
     }
 }

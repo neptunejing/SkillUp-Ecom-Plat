@@ -23,6 +23,9 @@ spring:
     baseline-on-migrate: true
     enabled: true
 
+logging:
+  config: classpath:logback-spring.xml
+
 # Custom Config
 feign:
   okhttp:

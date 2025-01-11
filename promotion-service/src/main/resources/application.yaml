@@ -45,6 +45,9 @@ spring:
   session:
     store-type: none
 
+logging:
+  config: classpath:logback-spring.xml
+
 # Custom Config
 promotion:
   stock-strategy: optimisticBatis # [overall, sync, optimisticJooq, optimisticBatis]

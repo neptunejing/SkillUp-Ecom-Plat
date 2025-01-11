@@ -50,6 +50,7 @@ public class CreateOrderConsumer implements RocketMQListener<MessageExt> {
         // 幂等性检查：如果已经相同 orderId 的订单，直接返回
         OrderDomain existedOrderDomain = orderService.getOrderById(orderDomain.getOrderNumber());
         if (!Objects.isNull(existedOrderDomain)) {
+            log.warn("Duplicate consumption. Order exists [id = {}].", existedOrderDomain.getOrderNumber());
             return;
         }
 
@@ -61,9 +62,8 @@ public class CreateOrderConsumer implements RocketMQListener<MessageExt> {
                 .build();
         boolean isLocked = stockServiceApi.lockAvailableStock(stockDomain);
         if (!isLocked) {
-            log.warn("[OrderApp2.1] out of stock!");
+            log.warn("Lock cached stock failed.");
             orderDomain.setOrderStatus(OrderStatus.OUT_OF_STOCK);
-            // 库存不足直接返回
             return;
         }
 
@@ -73,7 +73,8 @@ public class CreateOrderConsumer implements RocketMQListener<MessageExt> {
             orderDomain.setOrderStatus(OrderStatus.CREATED);
             orderService.createOrder(orderDomain);
         } catch (Exception e) {
-            // 回滚预扣减操作
+            // 回滚锁定 redis 库存操作
+            log.error("Create order failed. {}", e.getMessage());
             stockDomain.setOperationName(OperationName.REVERT_STOCK);
             stockServiceApi.revertAvailableStock(stockDomain);
             return;
@@ -81,6 +82,5 @@ public class CreateOrderConsumer implements RocketMQListener<MessageExt> {
 
         mqSendRepo.sendMsgToTopic(lockStockTopic, JSON.toJSONString(orderDomain));
         mqSendRepo.sendDelayMsgToTopic(payCheckTopic, JSON.toJSONString(orderDomain), delaySeconds);
-        log.info("[OrderApp2.1] sent pay-check message. OrderId: {}", orderDomain.getOrderNumber());
     }
 }
