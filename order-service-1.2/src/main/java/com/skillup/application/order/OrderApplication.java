@@ -40,7 +40,6 @@ public class OrderApplication {
     @Value("${promotion.topic.deduct-stock}")
     String deductStockTopic;
 
-    @Transactional
     public OrderDomain createBuyNowOrder(OrderDomain orderDomain) {
         log.info("Create new order [id = {}]", orderDomain.getOrderNumber());
         // 新建流水记录: LOCK_STOCK
