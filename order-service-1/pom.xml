@@ -96,6 +96,12 @@
             <groupId>io.github.openfeign</groupId>
             <artifactId>feign-okhttp</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.skillup</groupId>
+            <artifactId>rate-limiter</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>

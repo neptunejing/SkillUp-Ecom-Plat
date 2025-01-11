@@ -9,12 +9,12 @@ import com.skillup.application.order.OrderApplication;
 import com.skillup.domain.order.OrderDomain;
 import com.skillup.domain.order.OrderService;
 import com.skillup.domain.order.util.OrderStatus;
+import com.skillup.ratelimiter.annotation.RateLimit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -29,8 +29,7 @@ public class OrderController {
     @Autowired
     OrderService orderService;
 
-
-    // BuyNowOrder 即直接下单，不经过放入 cart 的步骤
+    @RateLimit
     @PostMapping()
     public ResponseEntity<OrderOutDto> createBuyNowOrder(@RequestBody OrderInDto orderInDto) {
         OrderDomain orderDomain = orderApplication.createBuyNowOrder(toDomain(orderInDto));
@@ -46,6 +45,7 @@ public class OrderController {
         return ResponseEntity.status(SkillUpCommon.SUCCESS).body(toOutDto(orderDomain));
     }
 
+    @RateLimit
     @PatchMapping("/pay")
     public ResponseEntity<OrderOutDto> payBuyNowOrder(@RequestBody OrderStatusInDto orderStatusInDto) throws ExecutionException, InterruptedException {
         OrderDomain orderDomain = orderApplication.payBuyNowOrder(orderStatusInDto.getOrderNumber(), orderStatusInDto.getExistStatus(), orderStatusInDto.getExpectStatus());

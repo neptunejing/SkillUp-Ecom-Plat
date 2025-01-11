@@ -119,6 +119,8 @@ useEpollNativeSelector = true
 
 ## 运行
 
+执行根模块的 `mvn package` 确保每个服务的 jar 包存在。
+
 ### 启动环境服务
 
 运行前确认 Redis 集群已经就绪:

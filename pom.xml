@@ -19,6 +19,7 @@
         <module>order-service-2.2</module>
         <module>frontend-service</module>
         <module>gateway-service</module>
+        <module>rate-limiter</module>
     </modules>
 
     <properties>
