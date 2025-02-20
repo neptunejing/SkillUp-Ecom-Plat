@@ -22,6 +22,23 @@ spring:
   flyway:
     baseline-on-migrate: true
     enabled: true
+  redis:
+    database: 0
+    timeout: 3000ms
+    lettuce:
+      pool:
+        max-active: 1000 # 连接池最大连接数（负值表示无限制）
+        max-wait: -1 # 连接池最大阻塞等待时间
+        max-idle: 10 # 连接池最大空闲连接
+        min-idle: 10 # 连接池最小空闲连接
+    cluster:
+      nodes:
+        - localhost:6379
+        - localhost:6380
+        - localhost:6381
+        - localhost:6382
+        - localhost:6383
+        - localhost:6384
 
 logging:
   config: classpath:logback-spring.xml
