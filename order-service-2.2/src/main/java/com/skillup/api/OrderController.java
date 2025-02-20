@@ -28,8 +28,7 @@ public class OrderController {
 
     @Autowired
     OrderService orderService;
-
-    @RateLimit
+    
     @PostMapping()
     public ResponseEntity<OrderOutDto> createBuyNowOrder(@RequestBody OrderInDto orderInDto) {
         OrderDomain orderDomain = orderApplication.createBuyNowOrder(toDomain(orderInDto));
@@ -45,7 +44,6 @@ public class OrderController {
         return ResponseEntity.status(SkillUpCommon.SUCCESS).body(toOutDto(orderDomain));
     }
 
-    @RateLimit
     @PatchMapping("/pay")
     public ResponseEntity<OrderOutDto> payBuyNowOrder(@RequestBody OrderStatusInDto orderStatusInDto) throws ExecutionException, InterruptedException {
         OrderDomain orderDomain = orderApplication.payBuyNowOrder(orderStatusInDto.getOrderNumber(), orderStatusInDto.getExistStatus(), orderStatusInDto.getExpectStatus());

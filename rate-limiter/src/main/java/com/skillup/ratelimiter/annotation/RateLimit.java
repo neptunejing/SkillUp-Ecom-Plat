@@ -8,8 +8,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RateLimit {
-    /**
-     * 令牌生成速度, 默认每秒 1000 个
-     */
-    double permitsPerSecond() default 1000;
+    int rate() default 2000; // token 生成速率（每秒）
+    int capacity() default 4000; // 桶容量
 }
